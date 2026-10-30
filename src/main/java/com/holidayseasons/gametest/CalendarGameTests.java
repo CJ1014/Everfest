@@ -37,8 +37,8 @@ public final class CalendarGameTests {
 
     @GameTest(template = "empty_5x5")
     public static void wallCalendarNeedsSupport(GameTestHelper helper) {
-        BlockPos support = new BlockPos(2, 1, 3);
-        BlockPos calendar = new BlockPos(2, 1, 2);
+        BlockPos support = new BlockPos(2, 2, 3);
+        BlockPos calendar = new BlockPos(2, 2, 2);
         helper.setBlock(support, Blocks.OAK_PLANKS);
         // Facing NORTH = hangs on the block to its south.
         helper.setBlock(calendar, EverFestBlocks.WALL_CALENDAR.get().defaultBlockState().setValue(WallCalendarBlock.FACING, Direction.NORTH));
@@ -51,7 +51,7 @@ public final class CalendarGameTests {
 
     @GameTest(template = "empty_5x5")
     public static void wallCalendarCannotFloat(GameTestHelper helper) {
-        BlockPos pos = new BlockPos(2, 2, 2);
+        BlockPos pos = new BlockPos(2, 3, 2);
         boolean survives = EverFestBlocks.WALL_CALENDAR.get().defaultBlockState()
                 .canSurvive(helper.getLevel(), helper.absolutePos(pos));
         helper.assertTrue(!survives, "A wall calendar with nothing behind it must not survive");

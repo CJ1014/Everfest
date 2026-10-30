@@ -52,6 +52,16 @@ public final class ServerConfig {
     public final ModConfigSpec.ConfigValue<List<? extends String>> disabledHolidays;
     public final ModConfigSpec.IntValue historyYears;
     public final Map<String, HolidayOverrides> holidays = new LinkedHashMap<>();
+    // villages
+    public final ModConfigSpec.BooleanValue villageCelebrations;
+    public final ModConfigSpec.BooleanValue festivalSchedules;
+    public final ModConfigSpec.IntValue villagerBudgetPerTick;
+    public final ModConfigSpec.IntValue taskCooldownTicks;
+    public final ModConfigSpec.BooleanValue villagerDecorations;
+    public final ModConfigSpec.IntValue maxDecorationsPerVillage;
+    public final ModConfigSpec.IntValue decorationRadius;
+    public final ModConfigSpec.IntValue decorationLedgerBudget;
+    public final ModConfigSpec.BooleanValue reconcileUnloadedVillages;
 
 
     /** Per-holiday overrides for a built-in holiday. Negative numbers / empty strings mean "use the datapack value". */
@@ -154,6 +164,31 @@ public final class ServerConfig {
         for (String id : BUILT_IN_ORDER) {
             holidays.put(id, new HolidayOverrides(b, id, BUILT_IN_HOLIDAYS.get(id)));
         }
+        b.pop();
+
+        b.comment("Autonomous village celebrations.").push("villages");
+        String v = "holidayseasons.configuration.villages.";
+        villageCelebrations = b.comment("Villagers prepare for and celebrate holidays on their own.")
+                .translation(v + "enabled").define("enabled", true);
+        festivalSchedules = b.comment("On celebration days villagers work less and spend more time at the festival square.",
+                        "Only replaces vanilla's default villager schedules, never schedules set by other mods; reverts afterwards.")
+                .translation(v + "festivalSchedules").define("festivalSchedules", true);
+        villagerBudgetPerTick = b.comment("Maximum villagers EverFest examines per server tick (performance budget).")
+                .translation(v + "villagerBudgetPerTick").defineInRange("villagerBudgetPerTick", 6, 1, 100);
+        taskCooldownTicks = b.comment("Minimum ticks between two holiday activities of the same villager.")
+                .translation(v + "taskCooldownTicks").defineInRange("taskCooldownTicks", 300, 20, 24000);
+        villagerDecorations = b.comment("Villagers put up temporary decorations (display entities and invisible light).",
+                        "Decorations never replace blocks and disappear over the holiday's cleanup days.")
+                .translation(v + "decorations").define("decorations", true);
+        maxDecorationsPerVillage = b.comment("Decorations per village at full intensity.")
+                .translation(v + "maxDecorationsPerVillage").defineInRange("maxDecorationsPerVillage", 18, 0, 200);
+        decorationRadius = b.comment("How far from the festival square villagers decorate.")
+                .translation(v + "decorationRadius").defineInRange("decorationRadius", 20, 4, 64);
+        decorationLedgerBudget = b.comment("Decoration ledger entries checked per tick for cleanup.")
+                .translation(v + "decorationLedgerBudget").defineInRange("decorationLedgerBudget", 16, 1, 1000);
+        reconcileUnloadedVillages = b.comment("When a village loads after being unloaded during preparations, put up the decorations",
+                        "its villagers would have made meanwhile.")
+                .translation(v + "reconcileUnloadedVillages").define("reconcileUnloadedVillages", true);
         b.pop();
     }
 

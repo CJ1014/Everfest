@@ -144,9 +144,89 @@ uses Modrinth version ids, which pin the NeoForge files.
   celebrated (by design — no retroactive celebrations).
 * `/everfest holiday goto` is refused under FOLLOW_SEASON when the scheduling calendar differs from the displayed one.
 
-## Current milestone: 3 — Autonomous villages
+## Milestone 3 — Autonomous villages ✅ (acceptance criteria verified)
 
-## Next tasks
-* Village registry and celebration state (incl. abstract progress for unloaded villages), deterministic villager
-  personalities, holiday Brain behaviours that coexist with vanilla schedules, biome themes, temporary decoration
-  ledger with safe restore, GameTests.
+### Completed systems
+* **Brain integration** (`villager.HolidayBrainInjector`, `ai.CelebrationBehavior`): verified in the 1.21.1 source that
+  `Brain.addActivity*` *appends* behaviours and only overwrites the activity's entry requirements, so EverFest adds one
+  `CelebrationBehavior` instance each to IDLE, PLAY and MEET while re-supplying vanilla's exact requirements (MEET still
+  needs a meeting point). WORK/REST/PANIC/CORE/RAID/HIDE are never touched. Re-injected after `refreshBrain`
+  (profession change, growing up) by tracking brain identity. The behaviour yields to panic, sleep, trading, raids,
+  work and rest.
+* **Festival schedules** (`villager.HolidaySchedules`, registered `Schedule`s): on ACTIVE days only, and only replacing
+  vanilla's own default schedules (never another mod's): adults get a short work shift then festivities; a
+  New-Year night-party variant; children get more play time and a Halloween dusk variant. Schedules are not saved,
+  so a restart or holiday end always returns villagers to vanilla schedules.
+* **Personalities** (`VillagerPersonality`): deterministic from UUID + profession + age (sociability, generosity,
+  enthusiasm, preferred activity, gift preference, costume). Professions shape them (clerics social, farmers
+  feast/scarecrow, librarians book gifts, nitwits enthusiastic); children are more enthusiastic.
+* **Activity picking** (`ActivityPicker`, pure): phase × holiday behaviours × personality × profession × age ×
+  config intensity. Children never get adult jobs; adults leave trick-or-treating and egg hunts to children.
+* **Tasks** run through vanilla walk/look memories so vanilla pathfinding moves villagers: DECORATE (visibly carries
+  the item, places it, particles + sounds), GATHER (go to the square, dance/hop, note particles, celebrate sounds),
+  SOCIALIZE (pair up, face each other, chat, hearts), FEAST (hold the dish, bites with item particles + eat sounds),
+  FIREWORKS (rockets without explosion data so they can never hurt anyone; bursts are drawn with particles),
+  TIDY_UP (take decorations down during cleanup). Unreachable/stuck targets fail cleanly.
+* **Director** (`CelebrationDirector`): villagers tracked through join/leave events (never scanned), a configurable
+  per-tick villager budget (default 6) processed round-robin, one village updated per tick.
+* **Villages**: identified by their bell (meeting point) or a 64-block cell; persistent `VillageRecord`s keep abstract
+  progress for unloaded villages; style from the villagers' `VillagerType` (plains, desert, savanna, snow, taiga,
+  jungle, swamp → materials). Only real villages (bell or ≥4 villagers) decorate.
+* **Decorations** (`decoration`): themes for halloween, christmas, easter, new_years, valentines, harvest,
+  independence_day, adapted per biome style, incl. composite centrepieces (Christmas tree with ornaments, pumpkin heap,
+  scarecrow, feast table, flower arch, hearts, flags, candy canes). Built from **block-display entities** (never replace
+  a block, no collision, drop nothing → no farming exploit) plus invisible `minecraft:light` blocks only into air
+  (lights the square, spawn-proofs it).
+* **Decoration ledger** (`DecorationLedger`): every entity and block change recorded; staggered removal over the
+  cleanup days; ABORT/COMPLETED expires immediately; a light block is removed only if it is still exactly the light
+  EverFest placed (a player's block is never touched); display entities carry their ledger id and are rejected on load
+  if unknown or expired (crash safety); unloaded chunks are never force-loaded — due entries wait for their chunk.
+* **Unloaded-village reconciliation**: when a village returns after ≥1 day away during a live holiday, the
+  decorations its villagers would have made are put up (bounded per tick, retried).
+* **Serene Seasons day alignment**: `/season set` resets SS to the start of a day while the world is mid-day, which
+  made SS days roll over at odd hours. EverFest dates now roll over at world dawn using the SS day that overlaps the
+  world day most (identical to SS when its clock is aligned); `date set` compensates when run after noon.
+* **Diagnostics**: `/everfest villages` (operators): festival, tracked villagers, tasks by type, villagers on festival
+  schedules, decorations per village vs target.
+
+### Test results
+* **Unit tests — 61/61 passing**, new: personality determinism and ranges, every costume occurs, children more
+  enthusiastic; children trick-or-treat and adults hand out candy; gift exchange only where defined; phase→task
+  mapping; professions shift weights; nitwits participate; zero intensity disables participation; decoration ramp and
+  staggered expiry; SS dawn alignment (aligned = SS day, misaligned rolls at dawn, date-set compensation for every
+  time of day and target day).
+* **GameTests — 11/11 passing**, new: vanilla behaviour counts preserved (+1 on IDLE/MEET/PLAY only, others identical),
+  idempotent injection and re-injection after `refreshBrain`; villager walks to the festival spot and is released with
+  empty hands and an untouched non-vanilla schedule; vanilla panic interrupts a running celebration; villager visibly
+  carries and places a decoration (displays + light, floor untouched) and cleanup removes it; cleanup keeps a player's
+  block placed over a decoration light; blocks and floating spots are never used; unknown decoration entities are
+  rejected while other displays are untouched.
+* **Live world (dedicated server + client, savanna village)**:
+  * Halloween PREPARING: villagers autonomously carried and placed pumpkins, carved pumpkins, bale-and-lantern,
+    pumpkin patch; decoration count ramped to the day's target, then villagers switched to socializing.
+  * Halloween ACTIVE: all 10 villagers on festival schedules, gathering at the square.
+  * Player left (village unloaded, 59 entries pending, nothing force-loaded); date moved past Halloween into
+    Thanksgiving preparation; on return the expired Halloween decorations were removed as chunks loaded and the
+    village caught up its Thanksgiving decorations.
+  * Thanksgiving ACTIVE: the village gathered around the feast table (GATHER/FEAST/SOCIALIZE).
+  * Date moved to a quiet day (Jan 6): **0 decorations, 0 tasks, 0 villagers on festival schedules** — back to vanilla.
+  * During work hours and at night no tasks were assigned (villagers at work / asleep).
+
+### Bugs found and fixed during M3 verification
+* Ledger wrote its entry *after* spawning the display, so its own join guard rejected the decoration (GameTest).
+* Villagers kept holding a placed decoration until the next brain tick (GameTest).
+* Festival cache never computed: `now - Long.MIN_VALUE` overflow (live console).
+* `holiday goto` targeted an already-celebrated occurrence (live).
+* Lone wandering villagers formed "villages" and decorated (live screenshot).
+* Catch-up placement consumed slots on failed spot searches (live).
+* Serene Seasons day boundary drift after `/season set` (live).
+* Activity picker never offered TIDY_UP (unit test).
+
+### Known issues / limitations (M3)
+* Holiday-specific child activities (trick-or-treat, egg hunts), gift exchange and home visits fall back to gathering
+  until Milestones 4–6 implement them.
+* Biome styles other than savanna were verified only in code, not visually in a live village yet.
+* In SEASON_SYNCED mode `/time set` on an old world makes Serene Seasons rewind by the world's age (SS behaviour); EverFest
+  handles it safely (aborts/never re-celebrates) but players may be surprised.
+
+## Current milestone: 4 — Halloween playable release

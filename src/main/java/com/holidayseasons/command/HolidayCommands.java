@@ -110,9 +110,11 @@ final class HolidayCommands {
         HolidayEngineCore.Context c = svc.context();
         CalendarSystem sys = c.system();
         HolidayWindow target = null;
-        for (int y = c.currentYear(); y <= c.currentYear() + 1; y++) {
+        for (int y = c.currentYear(); y <= c.currentYear() + 2; y++) {
             HolidayWindow w = h.window(y, sys);
-            if ((prepare ? w.prepStart() : w.start()) > c.today()) {
+            var rec = svc.records().get(com.holidayseasons.holiday.OccurrenceRecord.key(h.id(), sys.signature(), y));
+            boolean used = rec != null && (rec.activations() > 0 || rec.phase() == com.holidayseasons.holiday.HolidayPhase.COMPLETED);
+            if (!used && (prepare ? w.prepStart() : w.start()) > c.today()) {
                 target = w;
                 break;
             }

@@ -38,6 +38,7 @@ public final class EverFestCommands {
                         .then(Commands.argument("days", IntegerArgumentType.integer(-100000, 100000)).executes(EverFestCommands::addDays)))
                 .then(Commands.literal("clearoverride").requires(s -> s.hasPermission(ADMIN_LEVEL))
                         .executes(EverFestCommands::clearOverride)));
+        root.then(Commands.literal("villages").requires(s -> s.hasPermission(ADMIN_LEVEL)).executes(EverFestCommands::villages));
         HolidayCommands.attach(root);
         dispatcher.register(root);
     }
@@ -93,6 +94,33 @@ public final class EverFestCommands {
         if (sched != s) {
             src.sendSuccess(() -> Component.literal("Holidays are scheduled on the season calendar: " + sched.date()), false);
         }
+        return 1;
+    }
+
+    private static int villages(CommandContext<CommandSourceStack> ctx) {
+        var server = EverFestServer.require();
+        var director = server.director();
+        var festival = director.festival();
+        CommandSourceStack src = ctx.getSource();
+        src.sendSuccess(() -> Component.literal("Festival: " + (festival == null ? "none" : festival.holiday().id() + " " + festival.phase())
+                + "  tracked villagers: " + director.trackedCount() + "  running tasks: " + director.activeTasks()
+                + "  decoration entries: " + server.ledger().size()), false);
+        src.sendSuccess(() -> Component.literal("Assigned tasks: " + director.taskCounts()), false);
+        int[] onFestivalSchedule = {0};
+        for (var level : server.server().getAllLevels()) {
+            for (var e : level.getAllEntities()) {
+                if (e instanceof net.minecraft.world.entity.npc.Villager v
+                        && com.holidayseasons.villager.HolidaySchedules.isOurs(v.getBrain().getSchedule())) onFestivalSchedule[0]++;
+            }
+        }
+        src.sendSuccess(() -> Component.literal("Villagers on festival schedules: " + onFestivalSchedule[0]), false);
+        director.liveVillageSizes().forEach((k, n) -> {
+            var rec = director.villages().get(k);
+            String occ = festival == null ? null : festival.occurrence().key();
+            src.sendSuccess(() -> Component.literal(" " + k + ": " + n + " villagers, style " + (rec == null ? "?" : rec.style().id())
+                    + (occ == null ? "" : ", decorations up " + server.ledger().decorationsFor(k, occ)
+                    + " / target " + director.decorationTargetFor(festival))), false);
+        });
         return 1;
     }
 

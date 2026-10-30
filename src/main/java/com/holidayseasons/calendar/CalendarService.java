@@ -97,19 +97,28 @@ public final class CalendarService {
         }
 
         Optional<SeasonReading> reading = seasonReading();
-        reading.ifPresent(this::trackSeasonYear);
-
-        CalendarSnapshot next = computeSnapshot(reading.orElse(null), dayTime);
-        if (pendingSeasonTarget != null) {
-            if (next.date().equals(pendingSeasonTarget) || --pendingTicksLeft <= 0) {
-                if (!next.date().equals(pendingSeasonTarget)) {
-                    EverFest.LOGGER.warn("EverFest: Serene Seasons did not reach {} (now {})", pendingSeasonTarget, next.date());
-                }
+        if (pendingSeasonTarget != null && reading.isPresent()) {
+            // Waiting for Serene Seasons to finish a two-step date change; the year is fixed up once it arrives.
+            SeasonReading r = reading.get();
+            long q = alignedCycle(r, dayTime);
+            CalendarDate reached = SeasonCycleMapper.dateFor(pendingSeasonTarget.year(), q, r.subSeasonTicks(), r.dayDuration(),
+                    settings.seasonSystem(r.daysPerSubSeason()));
+            boolean arrived = reached.month() == pendingSeasonTarget.month() && reached.day() == pendingSeasonTarget.day();
+            if (arrived || --pendingTicksLeft <= 0) {
+                if (!arrived) EverFest.LOGGER.warn("EverFest: Serene Seasons did not reach {} (now {})", pendingSeasonTarget, reached);
+                data.seasonYear = pendingSeasonTarget.year();
+                data.lastSeasonYearTicks = SeasonCycleMapper.yearTicks(q, r.subSeasonTicks());
+                data.setDirty();
                 pendingSeasonTarget = null;
             } else {
                 return;
             }
+        } else {
+            pendingSeasonTarget = null;
+            reading.ifPresent(r -> trackSeasonYear(r, dayTime));
         }
+
+        CalendarSnapshot next = computeSnapshot(reading.orElse(null), dayTime);
         CalendarSnapshot previous = current;
         current = next;
         seasonSchedule = reading.map(r -> seasonSnapshot(r, dayTime)).orElse(null);
@@ -133,8 +142,20 @@ public final class CalendarService {
         }
     }
 
-    private void trackSeasonYear(SeasonReading r) {
-        long yearTicks = SeasonCycleMapper.yearTicks(r.cycleTicks(), r.subSeasonTicks());
+    /**
+     * Serene Seasons position used for dates. {@code /season set} resets SS to the start of a day while the world clock
+     * may be mid-day, which would make SS days roll over at an arbitrary hour. EverFest's day therefore follows the
+     * world clock (new day at dawn) and is the SS day that overlaps most with it. When SS and the world clock are
+     * aligned (the normal case) this is exactly SS's day.
+     */
+    static long alignedCycle(SeasonReading r, long dayTime) {
+        if (r.dayDuration() != ClockMath.TICKS_PER_DAY) return r.cycleTicks();
+        long tod = Math.floorMod(dayTime, ClockMath.TICKS_PER_DAY);
+        return Math.floorMod(r.cycleTicks() - tod + ClockMath.TICKS_PER_DAY / 2, r.cycleLength());
+    }
+
+    private void trackSeasonYear(SeasonReading r, long dayTime) {
+        long yearTicks = SeasonCycleMapper.yearTicks(alignedCycle(r, dayTime), r.subSeasonTicks());
         if (data.lastSeasonYearTicks < 0) {
             data.lastSeasonYearTicks = yearTicks;
             data.setDirty();
@@ -199,7 +220,7 @@ public final class CalendarService {
 
     private CalendarSnapshot seasonSnapshot(SeasonReading r, long dayTime) {
         FixedMonthCalendarSystem system = settings.seasonSystem(r.daysPerSubSeason());
-        CalendarDate date = SeasonCycleMapper.dateFor(data.seasonYear, r.cycleTicks(), r.subSeasonTicks(), r.dayDuration(), system);
+        CalendarDate date = SeasonCycleMapper.dateFor(data.seasonYear, alignedCycle(r, dayTime), r.subSeasonTicks(), r.dayDuration(), system);
         long epochDay = system.toEpochDay(date);
         String iso = date.toIsoString();
         if (settings.mode() == CalendarMode.SEASON_SYNCED && !iso.equals(data.lastSyncedDate)) {
@@ -330,10 +351,11 @@ public final class CalendarService {
                     SubSeason sub = SubSeason.forMonth(target.month());
                     // Use Serene Seasons' own public command to move its cycle, then advance the clock to the day.
                     runCommand("season set " + sub.id());
-                    if (target.day() > 1) runCommand("time add " + ((target.day() - 1L) * r.dayDuration()));
-                    long subTicks = r.subSeasonTicks();
-                    data.seasonYear = target.year();
-                    data.lastSeasonYearTicks = SeasonCycleMapper.yearTicks(sub.ordinal() * subTicks + (target.day() - 1L) * r.dayDuration(), subTicks);
+                    // After 'season set' SS sits at the start of a day; with dawn-aligned dates that lands on the
+                    // sub-season's first day before noon and on the previous day after noon, so add one more day then (strictly after noon: at exactly noon it rounds onto the first day).
+                    long tod = Math.floorMod(server.overworld().getDayTime(), ClockMath.TICKS_PER_DAY);
+                    long addDays = (target.day() - 1L) + (r.dayDuration() == ClockMath.TICKS_PER_DAY && tod > ClockMath.TICKS_PER_DAY / 2 ? 1 : 0);
+                    if (addDays > 0) runCommand("time add " + (addDays * r.dayDuration()));
                     pendingSeasonTarget = target;
                     pendingTicksLeft = 100;
                 }

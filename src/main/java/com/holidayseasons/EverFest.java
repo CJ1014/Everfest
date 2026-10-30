@@ -41,11 +41,15 @@ public final class EverFest {
         EverFestBlocks.register(modBus);
         EverFestItems.register(modBus);
         EverFestCreativeTabs.register(modBus);
+        com.holidayseasons.villager.HolidaySchedules.register(modBus);
 
         modBus.addListener(EverFestNetwork::register);
         modBus.addListener(this::commonSetup);
         modBus.addListener(this::onConfigReload);
-        modBus.addListener((net.neoforged.neoforge.event.RegisterGameTestsEvent e) -> e.register(com.holidayseasons.gametest.CalendarGameTests.class));
+        modBus.addListener((net.neoforged.neoforge.event.RegisterGameTestsEvent e) -> {
+            e.register(com.holidayseasons.gametest.CalendarGameTests.class);
+            e.register(com.holidayseasons.gametest.VillageGameTests.class);
+        });
 
         NeoForge.EVENT_BUS.addListener(this::onServerStarted);
         NeoForge.EVENT_BUS.addListener(this::onServerStopped);
@@ -56,6 +60,17 @@ public final class EverFest {
         NeoForge.EVENT_BUS.addListener((CalendarDateChangedEvent e) -> {
             EverFestServer s = EverFestServer.get();
             if (s != null) s.holidays().markDirty();
+        });
+        NeoForge.EVENT_BUS.addListener((com.holidayseasons.holiday.HolidayPhaseChangedEvent e) -> {
+            EverFestServer s = EverFestServer.get();
+            if (s != null) s.director().onPhaseChanged(e);
+        });
+        NeoForge.EVENT_BUS.addListener(this::onEntityJoin);
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent e) -> {
+            EverFestServer s = EverFestServer.get();
+            if (s != null && !e.getLevel().isClientSide() && e.getEntity() instanceof net.minecraft.world.entity.npc.Villager v) {
+                s.director().untrack(v);
+            }
         });
         HolidayRegistry.onReload(() -> {
             EverFestServer s = EverFestServer.get();
@@ -92,6 +107,17 @@ public final class EverFest {
     private void onServerTick(ServerTickEvent.Post event) {
         EverFestServer s = EverFestServer.get();
         if (s != null) s.tick();
+    }
+
+    private void onEntityJoin(net.neoforged.neoforge.event.entity.EntityJoinLevelEvent event) {
+        if (event.getLevel().isClientSide()) return;
+        EverFestServer s = EverFestServer.get();
+        if (s == null) return;
+        if (event.getEntity() instanceof net.minecraft.world.entity.npc.Villager v) {
+            s.director().track(v);
+        } else if (s.ledger().shouldRejectEntity(event.getEntity(), s.calendar().schedulingSnapshot().epochDay())) {
+            event.setCanceled(true);
+        }
     }
 
     private void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
