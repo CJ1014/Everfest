@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " S ",
+    "LDL",
+    " L "
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:string"
+    },
+    "L": {
+      "item": "minecraft:leather"
+    },
+    "D": {
+      "item": "minecraft:orange_dye"
+    }
+  },
+  "result": {
+    "id": "holidayseasons:candy_bag",
+    "count": 1
+  }
+}

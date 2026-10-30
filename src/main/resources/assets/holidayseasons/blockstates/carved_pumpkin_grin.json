@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "holidayseasons:block/carved_pumpkin_grin"
+    },
+    "facing=east": {
+      "model": "holidayseasons:block/carved_pumpkin_grin",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "holidayseasons:block/carved_pumpkin_grin",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "holidayseasons:block/carved_pumpkin_grin",
+      "y": 270
+    }
+  }
+}

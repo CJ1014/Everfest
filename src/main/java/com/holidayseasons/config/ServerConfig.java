@@ -62,6 +62,22 @@ public final class ServerConfig {
     public final ModConfigSpec.IntValue decorationRadius;
     public final ModConfigSpec.IntValue decorationLedgerBudget;
     public final ModConfigSpec.BooleanValue reconcileUnloadedVillages;
+    // homes
+    public final ModConfigSpec.IntValue maxHomesPerPlayer;
+    public final ModConfigSpec.IntValue minHomeDistance;
+    public final ModConfigSpec.IntValue homeProtectionRadius;
+    public final ModConfigSpec.BooleanValue protectHearths;
+    // halloween
+    public final ModConfigSpec.IntValue candyPerVisitorPerDay;
+    public final ModConfigSpec.BooleanValue trickOrTreating;
+    public final ModConfigSpec.IntValue maxTrickOrTreatGroups;
+    public final ModConfigSpec.IntValue trickOrTreatRadius;
+    public final ModConfigSpec.IntValue maxVisitsPerHouse;
+    public final ModConfigSpec.BooleanValue villagerCostumes;
+    public final ModConfigSpec.BooleanValue harmlessTricks;
+    public final ModConfigSpec.BooleanValue halloweenCreatures;
+    public final ModConfigSpec.IntValue creaturesPerPlayer;
+    public final ModConfigSpec.DoubleValue creatureSpawnChance;
 
 
     /** Per-holiday overrides for a built-in holiday. Negative numbers / empty strings mean "use the datapack value". */
@@ -189,6 +205,41 @@ public final class ServerConfig {
         reconcileUnloadedVillages = b.comment("When a village loads after being unloaded during preparations, put up the decorations",
                         "its villagers would have made meanwhile.")
                 .translation(v + "reconcileUnloadedVillages").define("reconcileUnloadedVillages", true);
+        b.pop();
+
+        b.comment("Player homes registered with a Holiday Hearth.").push("homes");
+        String h = "holidayseasons.configuration.homes.";
+        maxHomesPerPlayer = b.translation(h + "maxHomesPerPlayer").defineInRange("maxHomesPerPlayer", 2, 0, 32);
+        minHomeDistance = b.comment("Minimum distance between hearths of different players.")
+                .translation(h + "minHomeDistance").defineInRange("minHomeDistance", 16, 0, 256);
+        homeProtectionRadius = b.comment("Villagers never decorate within this radius of a hearth unless its owner allows it.")
+                .translation(h + "homeProtectionRadius").defineInRange("homeProtectionRadius", 12, 0, 64);
+        protectHearths = b.comment("Only the owner (or an operator) can break a Holiday Hearth.")
+                .translation(h + "protectHearths").define("protectHearths", true);
+        b.pop();
+
+        b.comment("Halloween gameplay.").push("halloween");
+        String hw = "holidayseasons.configuration.halloween.";
+        trickOrTreating = b.comment("Village children go trick-or-treating on Halloween.")
+                .translation(hw + "trickOrTreating").define("trickOrTreating", true);
+        maxTrickOrTreatGroups = b.comment("Maximum trick-or-treat groups out at once per village.")
+                .translation(hw + "maxTrickOrTreatGroups").defineInRange("maxTrickOrTreatGroups", 3, 0, 16);
+        trickOrTreatRadius = b.comment("How far from their village children walk to knock on doors (blocks).")
+                .translation(hw + "trickOrTreatRadius").defineInRange("trickOrTreatRadius", 48, 8, 160);
+        maxVisitsPerHouse = b.comment("How many groups may knock on the same door per Halloween.")
+                .translation(hw + "maxVisitsPerHouse").defineInRange("maxVisitsPerHouse", 2, 1, 20);
+        candyPerVisitorPerDay = b.comment("How many candies each player may take from someone else's candy bowl per day.")
+                .translation(hw + "candyPerVisitorPerDay").defineInRange("candyPerVisitorPerDay", 1, 0, 64);
+        villagerCostumes = b.comment("Villagers wear costumes on Halloween (temporary, removed afterwards, never dropped).")
+                .translation(hw + "villagerCostumes").define("villagerCostumes", true);
+        harmlessTricks = b.comment("Children leave a harmless temporary trick (cobwebs, a pumpkin) when nobody answers.")
+                .translation(hw + "harmlessTricks").define("harmlessTricks", true);
+        halloweenCreatures = b.comment("Ghosts and gourdlings appear on Halloween nights (only then).")
+                .translation(hw + "creatures").define("creatures", true);
+        creaturesPerPlayer = b.comment("Maximum Halloween creatures near each player.")
+                .translation(hw + "creaturesPerPlayer").defineInRange("creaturesPerPlayer", 4, 0, 32);
+        creatureSpawnChance = b.comment("Chance per player per second to try spawning a Halloween creature at night.")
+                .translation(hw + "creatureSpawnChance").defineInRange("creatureSpawnChance", 0.08, 0.0, 1.0);
         b.pop();
     }
 

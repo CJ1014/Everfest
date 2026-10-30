@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "holidayseasons:block/tombstone"
+    },
+    "facing=east": {
+      "model": "holidayseasons:block/tombstone",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "holidayseasons:block/tombstone",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "holidayseasons:block/tombstone",
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "doorbell": {
+    "sounds": [
+      "holidayseasons:doorbell"
+    ],
+    "subtitle": "subtitles.holidayseasons.doorbell"
+  },
+  "knock": {
+    "sounds": [
+      "holidayseasons:knock"
+    ],
+    "subtitle": "subtitles.holidayseasons.knock"
+  },
+  "candy": {
+    "sounds": [
+      "holidayseasons:candy"
+    ],
+    "subtitle": "subtitles.holidayseasons.candy"
+  },
+  "candy_bowl_empty": {
+    "sounds": [
+      "holidayseasons:candy_bowl_empty"
+    ],
+    "subtitle": "subtitles.holidayseasons.candy_bowl_empty"
+  },
+  "ghost_moan": {
+    "sounds": [
+      "holidayseasons:ghost_moan"
+    ],
+    "subtitle": "subtitles.holidayseasons.ghost_moan"
+  },
+  "ghost_hurt": {
+    "sounds": [
+      "holidayseasons:ghost_hurt"
+    ],
+    "subtitle": "subtitles.holidayseasons.ghost_hurt"
+  },
+  "ghost_death": {
+    "sounds": [
+      "holidayseasons:ghost_death"
+    ],
+    "subtitle": "subtitles.holidayseasons.ghost_death"
+  },
+  "distant_bell": {
+    "sounds": [
+      "holidayseasons:distant_bell"
+    ],
+    "subtitle": "subtitles.holidayseasons.distant_bell"
+  },
+  "eerie_wind": {
+    "sounds": [
+      "holidayseasons:eerie_wind"
+    ],
+    "subtitle": "subtitles.holidayseasons.eerie_wind"
+  },
+  "whispers": {
+    "sounds": [
+      "holidayseasons:whispers"
+    ],
+    "subtitle": "subtitles.holidayseasons.whispers"
+  },
+  "gourdling_hop": {
+    "sounds": [
+      "holidayseasons:gourdling_hop"
+    ],
+    "subtitle": "subtitles.holidayseasons.gourdling_hop"
+  },
+  "gourdling_hurt": {
+    "sounds": [
+      "holidayseasons:gourdling_hurt"
+    ],
+    "subtitle": "subtitles.holidayseasons.gourdling_hurt"
+  },
+  "gourdling_death": {
+    "sounds": [
+      "holidayseasons:gourdling_death"
+    ],
+    "subtitle": "subtitles.holidayseasons.gourdling_death"
+  },
+  "scarecrow_rustle": {
+    "sounds": [
+      "holidayseasons:scarecrow_rustle"
+    ],
+    "subtitle": "subtitles.holidayseasons.scarecrow_rustle"
+  },
+  "scarecrow_creak": {
+    "sounds": [
+      "holidayseasons:scarecrow_creak"
+    ],
+    "subtitle": "subtitles.holidayseasons.scarecrow_creak"
+  },
+  "trick_poof": {
+    "sounds": [
+      "holidayseasons:trick_poof"
+    ],
+    "subtitle": "subtitles.holidayseasons.trick_poof"
+  }
+}

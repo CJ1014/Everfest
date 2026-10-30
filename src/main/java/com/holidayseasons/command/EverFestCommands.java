@@ -39,6 +39,13 @@ public final class EverFestCommands {
                 .then(Commands.literal("clearoverride").requires(s -> s.hasPermission(ADMIN_LEVEL))
                         .executes(EverFestCommands::clearOverride)));
         root.then(Commands.literal("villages").requires(s -> s.hasPermission(ADMIN_LEVEL)).executes(EverFestCommands::villages));
+        root.then(Commands.literal("halloween").requires(s -> s.hasPermission(ADMIN_LEVEL)).executes(EverFestCommands::halloweenStatus));
+        root.then(Commands.literal("home")
+                .then(Commands.literal("list").executes(EverFestCommands::listHomes))
+                .then(Commands.literal("register").requires(s -> s.hasPermission(ADMIN_LEVEL))
+                        .then(Commands.argument("pos", net.minecraft.commands.arguments.coordinates.BlockPosArgument.blockPos())
+                                .then(Commands.argument("owner", net.minecraft.commands.arguments.EntityArgument.player())
+                                        .executes(EverFestCommands::registerHome)))));
         HolidayCommands.attach(root);
         dispatcher.register(root);
     }
@@ -121,6 +128,47 @@ public final class EverFestCommands {
                     + (occ == null ? "" : ", decorations up " + server.ledger().decorationsFor(k, occ)
                     + " / target " + director.decorationTargetFor(festival))), false);
         });
+        return 1;
+    }
+
+    private static int halloweenStatus(CommandContext<CommandSourceStack> ctx) {
+        var s = EverFestServer.require();
+        var h = s.halloween();
+        ctx.getSource().sendSuccess(() -> Component.literal("Halloween: " + (h.halloween() == null ? "not live" : h.halloween().phase())
+                + "  night: " + h.isHalloweenNight() + "  trick-or-treat groups out: " + h.activeGroups()
+                + "  adults handing out candy: " + h.giverCount()), false);
+        return 1;
+    }
+
+    private static int listHomes(CommandContext<CommandSourceStack> ctx) {
+        var homes = EverFestServer.require().homes();
+        ServerPlayer p = ctx.getSource().getPlayer();
+        var list = p != null && !ctx.getSource().hasPermission(ADMIN_LEVEL) ? homes.ownedBy(p.getUUID()) : java.util.List.copyOf(homes.all());
+        ctx.getSource().sendSuccess(() -> Component.literal(list.size() + " registered homes"), false);
+        for (var h : list) {
+            ctx.getSource().sendSuccess(() -> Component.literal(" " + h.name() + " (" + h.ownerName() + ") hearth " + h.hearth.toShortString()
+                    + " entrance " + h.entrance().toShortString() + " visitors " + h.acceptVisitors() + " visits " + h.visitsThisYear()), false);
+        }
+        return list.size();
+    }
+
+    private static int registerHome(CommandContext<CommandSourceStack> ctx) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        var pos = net.minecraft.commands.arguments.coordinates.BlockPosArgument.getLoadedBlockPos(ctx, "pos");
+        ServerPlayer owner = net.minecraft.commands.arguments.EntityArgument.getPlayer(ctx, "owner");
+        var level = ctx.getSource().getLevel();
+        if (!level.getBlockState(pos).is(com.holidayseasons.block.EverFestBlocks.HOLIDAY_HEARTH.get())
+                || !(level.getBlockEntity(pos) instanceof com.holidayseasons.block.entity.HearthBlockEntity be)) {
+            ctx.getSource().sendFailure(Component.literal("There is no Holiday Hearth at " + pos.toShortString()));
+            return 0;
+        }
+        var homes = EverFestServer.require().homes();
+        if (homes.atHearth(level.dimension(), pos) != null) {
+            ctx.getSource().sendFailure(Component.literal("That hearth is already registered"));
+            return 0;
+        }
+        var home = homes.register(level, owner.getUUID(), owner.getGameProfile().getName(), pos);
+        be.setHomeId(home.id);
+        ctx.getSource().sendSuccess(() -> Component.translatable("holidayseasons.home.registered", home.name(), home.entrance().toShortString()), true);
         return 1;
     }
 

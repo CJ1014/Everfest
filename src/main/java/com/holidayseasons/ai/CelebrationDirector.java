@@ -178,6 +178,37 @@ public final class CelebrationDirector {
         }
     }
 
+    /** Assigns a director-managed task (e.g. a trick-or-treat follower), replacing any task that has not started. */
+    public void assignFromDirector(Villager v, CelebrationTask task) {
+        track(v);
+        CelebrationTask old = tasks.get(v.getUUID());
+        if (old != null && old.isRunning()) old.fail();
+        tasks.put(v.getUUID(), task);
+        assignedAt.put(v.getUUID(), v.level().getGameTime());
+    }
+
+    /** Beds of a loaded village's villagers (their houses), for door-to-door activities. */
+    public List<BlockPos> homesOf(String villageKey) {
+        LiveVillage lv = live.get(villageKey);
+        return lv == null ? List.of() : List.copyOf(lv.homes);
+    }
+
+    /** Loaded children of a village without a running task. */
+    public List<Villager> idleChildren(String villageKey) {
+        LiveVillage lv = live.get(villageKey);
+        List<Villager> out = new ArrayList<>();
+        if (lv == null) return out;
+        for (UUID id : lv.members) {
+            Villager c = tracked.get(id);
+            if (c == null || !c.isBaby() || !c.isAlive()) continue;
+            CelebrationTask t = tasks.get(id);
+            if (t != null && (t.isRunning() || t.type == TaskType.TRICK_OR_TREAT)) continue;
+            if (!CelebrationBehavior.eligible(c)) continue;
+            out.add(c);
+        }
+        return out;
+    }
+
     /** Assigns a task directly (GameTests, admin tools). The director will not replace or expire it. */
     public void assign(Villager v, CelebrationTask task) {
         track(v);
@@ -291,6 +322,8 @@ public final class CelebrationDirector {
         }
 
         boolean active = f != null && f.phase() == HolidayPhase.ACTIVE;
+        com.holidayseasons.server.EverFestServer services = com.holidayseasons.server.EverFestServer.get();
+        if (services != null) services.halloween().updateCostume(v, f, today);
         if (cfg(() -> ServerConfig.INSTANCE.festivalSchedules.get(), true)) {
             HolidayBrainInjector.applySchedule(v, active, active && f.has("party"), active && f.has("trick_or_treat"));
         }
@@ -365,6 +398,18 @@ public final class CelebrationDirector {
                 DecorationLedger.Entry e = ledger.findTidyTarget(level, lv.key, v.blockPosition(), 32);
                 yield e == null ? null : new TidyUpTask(occ, lv.key, e.pos(), e.occurrenceKey(), ledger, ItemStack.EMPTY);
             }
+            case TRICK_OR_TREAT -> {
+                var services = com.holidayseasons.server.EverFestServer.get();
+                if (services == null) yield null;
+                List<Villager> children = idleChildren(lv.key);
+                children.remove(v);
+                CelebrationTask t = services.halloween().formGroup(v, lv.key, f, children);
+                yield t != null ? t : new GatherTask(occ, lv.key, centre, standingSpot(level, centre, 2, 6), 200 + random.nextInt(200));
+            }
+            case HAND_OUT_CANDY -> {
+                var services = com.holidayseasons.server.EverFestServer.get();
+                yield services == null ? null : services.halloween().handOutTask(level, v, lv.key, occ, centre);
+            }
             // Implemented by later milestones; until then these holidays fall back to gathering.
             default -> new GatherTask(occ, lv.key, centre, standingSpot(level, centre, 2, 6), 200 + random.nextInt(300));
         };
@@ -390,6 +435,8 @@ public final class CelebrationDirector {
             spot = anchor == lv.centre ? findSpot(level, anchor, 3, radius, 2) : findSpot(level, anchor, 2, 6, 2);
         }
         if (spot == null) return null;
+        var services = com.holidayseasons.server.EverFestServer.get();
+        if (services != null && services.homes().blocksVillagerDecorations(level.dimension(), spot)) return null;
         DecorationPiece chosen = piece;
         boolean isCentre = wantCentre;
         float yaw = random.nextInt(4) * 90f;

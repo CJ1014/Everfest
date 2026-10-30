@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "holidayseasons:carved_pumpkin_cat"
+    },
+    {
+      "item": "minecraft:torch"
+    }
+  ],
+  "result": {
+    "id": "holidayseasons:jack_o_lantern_cat",
+    "count": 1
+  }
+}

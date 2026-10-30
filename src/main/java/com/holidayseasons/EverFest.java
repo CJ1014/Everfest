@@ -42,6 +42,9 @@ public final class EverFest {
         EverFestItems.register(modBus);
         EverFestCreativeTabs.register(modBus);
         com.holidayseasons.villager.HolidaySchedules.register(modBus);
+        com.holidayseasons.block.entity.EverFestBlockEntities.register(modBus);
+        com.holidayseasons.entity.EverFestEntities.register(modBus);
+        com.holidayseasons.sound.EverFestSounds.register(modBus);
 
         modBus.addListener(EverFestNetwork::register);
         modBus.addListener(this::commonSetup);
@@ -49,6 +52,7 @@ public final class EverFest {
         modBus.addListener((net.neoforged.neoforge.event.RegisterGameTestsEvent e) -> {
             e.register(com.holidayseasons.gametest.CalendarGameTests.class);
             e.register(com.holidayseasons.gametest.VillageGameTests.class);
+            e.register(com.holidayseasons.gametest.HalloweenGameTests.class);
         });
 
         NeoForge.EVENT_BUS.addListener(this::onServerStarted);
@@ -66,6 +70,8 @@ public final class EverFest {
             if (s != null) s.director().onPhaseChanged(e);
         });
         NeoForge.EVENT_BUS.addListener(this::onEntityJoin);
+        NeoForge.EVENT_BUS.addListener(this::onEntityInteract);
+        NeoForge.EVENT_BUS.addListener(this::onBlockBreak);
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent e) -> {
             EverFestServer s = EverFestServer.get();
             if (s != null && !e.getLevel().isClientSide() && e.getEntity() instanceof net.minecraft.world.entity.npc.Villager v) {
@@ -115,8 +121,35 @@ public final class EverFest {
         if (s == null) return;
         if (event.getEntity() instanceof net.minecraft.world.entity.npc.Villager v) {
             s.director().track(v);
-        } else if (s.ledger().shouldRejectEntity(event.getEntity(), s.calendar().schedulingSnapshot().epochDay())) {
+        } else if (s.ledger().shouldRejectEntity(event.getEntity(), s.calendar().schedulingSnapshot().epochDay())
+                || s.halloween().shouldRejectCreature(event.getEntity())) {
             event.setCanceled(true);
+        }
+    }
+
+    /** Players hand candy to village children by using candy on them. */
+    private void onEntityInteract(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteract event) {
+        if (event.getLevel().isClientSide() || !(event.getTarget() instanceof net.minecraft.world.entity.npc.Villager child)) return;
+        if (!child.isBaby() || !event.getItemStack().is(com.holidayseasons.item.EverFestItems.CANDY_TAG)) return;
+        EverFestServer s = EverFestServer.get();
+        if (s != null && event.getEntity() instanceof ServerPlayer player
+                && s.halloween().playerGivesCandy(player, child, event.getItemStack())) {
+            event.setCanceled(true);
+            event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+        }
+    }
+
+    /** Anti-grief: only the owner (or an operator) may break a Holiday Hearth. */
+    private void onBlockBreak(net.neoforged.neoforge.event.level.BlockEvent.BreakEvent event) {
+        if (!event.getState().is(com.holidayseasons.block.EverFestBlocks.HOLIDAY_HEARTH.get())) return;
+        if (ServerConfig.SPEC.isLoaded() && !ServerConfig.INSTANCE.protectHearths.get()) return;
+        EverFestServer s = EverFestServer.get();
+        if (s == null || !(event.getLevel() instanceof net.minecraft.server.level.ServerLevel level)) return;
+        var home = s.homes().atHearth(level.dimension(), event.getPos());
+        var player = event.getPlayer();
+        if (home != null && !home.owner.equals(player.getUUID()) && !player.hasPermissions(2)) {
+            event.setCanceled(true);
+            player.displayClientMessage(net.minecraft.network.chat.Component.translatable("holidayseasons.home.protected", home.ownerName()), true);
         }
     }
 

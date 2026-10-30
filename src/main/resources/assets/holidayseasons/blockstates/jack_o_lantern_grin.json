@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "holidayseasons:block/jack_o_lantern_grin"
+    },
+    "facing=east": {
+      "model": "holidayseasons:block/jack_o_lantern_grin",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "holidayseasons:block/jack_o_lantern_grin",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "holidayseasons:block/jack_o_lantern_grin",
+      "y": 270
+    }
+  }
+}

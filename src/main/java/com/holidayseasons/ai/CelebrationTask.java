@@ -93,6 +93,16 @@ public abstract class CelebrationTask {
         done = true;
     }
 
+    /** Recovers from a failed movement so a multi-destination task can try somewhere else. */
+    protected void clearFailure(Villager v) {
+        failed = false;
+        done = false;
+        stuckTicks = 0;
+        lastPos = v.blockPosition();
+        v.getBrain().eraseMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
+        v.getBrain().eraseMemory(MemoryModuleType.WALK_TARGET);
+    }
+
     // ------------------------------------------------------------------ helpers
 
     /** Walks towards {@code target}; returns true once within {@code closeEnough} blocks. Fails if unreachable/stuck. */

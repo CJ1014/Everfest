@@ -16,6 +16,10 @@ public final class ClientConfig {
     public final ModConfigSpec.BooleanValue showDateHud;
     public final ModConfigSpec.BooleanValue use24HourClock;
     public final ModConfigSpec.BooleanValue showHolidayToasts;
+    public final ModConfigSpec.DoubleValue effectsIntensity;
+    public final ModConfigSpec.BooleanValue halloweenFog;
+    public final ModConfigSpec.BooleanValue seasonalParticles;
+    public final ModConfigSpec.BooleanValue ambientSounds;
 
     private ClientConfig(ModConfigSpec.Builder b) {
         b.comment("Heads-up display").push("hud");
@@ -27,6 +31,17 @@ public final class ClientConfig {
         showHolidayToasts = b.comment("Show a notification when a holiday begins preparing or starts.")
                 .translation("holidayseasons.configuration.showHolidayToasts")
                 .define("showHolidayToasts", true);
+        b.pop();
+
+        b.comment("Atmosphere and visual effects (client-side only).").push("effects");
+        effectsIntensity = b.comment("Scales particles, fog and ambient sounds. 0 disables them.")
+                .translation("holidayseasons.configuration.effectsIntensity").defineInRange("intensity", 1.0, 0.0, 2.0);
+        halloweenFog = b.comment("Creepy fog on Halloween nights.")
+                .translation("holidayseasons.configuration.halloweenFog").define("halloweenFog", true);
+        seasonalParticles = b.comment("Falling leaves in autumn and other seasonal particles.")
+                .translation("holidayseasons.configuration.seasonalParticles").define("seasonalParticles", true);
+        ambientSounds = b.comment("Distant bells, wind and whispers on Halloween nights.")
+                .translation("holidayseasons.configuration.ambientSounds").define("ambientSounds", true);
         b.pop();
     }
 }

@@ -5,6 +5,8 @@ import com.holidayseasons.calendar.CalendarService;
 import com.holidayseasons.ai.CelebrationDirector;
 import com.holidayseasons.decoration.DecorationLedger;
 import com.holidayseasons.holiday.HolidayService;
+import com.holidayseasons.home.HomeRegistry;
+import com.holidayseasons.reputation.ReputationData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.Villager;
@@ -25,12 +27,30 @@ public final class EverFestServer {
     private final CalendarService calendar;
     private final HolidayService holidays;
     private final CelebrationDirector director;
+    private final HomeRegistry homes;
+    private final ReputationData reputation;
+    private final com.holidayseasons.event.HalloweenService halloween;
 
     private EverFestServer(MinecraftServer server) {
         this.server = server;
         this.calendar = new CalendarService(server);
         this.holidays = new HolidayService(server, calendar);
+        this.homes = server.overworld().getDataStorage().computeIfAbsent(HomeRegistry.FACTORY, HomeRegistry.FILE_ID);
+        this.reputation = server.overworld().getDataStorage().computeIfAbsent(ReputationData.FACTORY, ReputationData.FILE_ID);
         this.director = new CelebrationDirector(server, calendar, holidays);
+        this.halloween = new com.holidayseasons.event.HalloweenService(server, this);
+    }
+
+    public HomeRegistry homes() {
+        return homes;
+    }
+
+    public ReputationData reputation() {
+        return reputation;
+    }
+
+    public com.holidayseasons.event.HalloweenService halloween() {
+        return halloween;
     }
 
     /** Entities in spawn chunks join before the services exist; adopt them once at start-up. */
@@ -96,5 +116,6 @@ public final class EverFestServer {
         calendar.tick();
         holidays.tick();
         director.tick();
+        halloween.tick();
     }
 }

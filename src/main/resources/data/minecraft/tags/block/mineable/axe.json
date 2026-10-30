@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "holidayseasons:carved_pumpkin_grin",
+    "holidayseasons:jack_o_lantern_grin",
+    "holidayseasons:carved_pumpkin_scary",
+    "holidayseasons:jack_o_lantern_scary",
+    "holidayseasons:carved_pumpkin_silly",
+    "holidayseasons:jack_o_lantern_silly",
+    "holidayseasons:carved_pumpkin_cat",
+    "holidayseasons:jack_o_lantern_cat",
+    "holidayseasons:carved_pumpkin_ghost",
+    "holidayseasons:jack_o_lantern_ghost"
+  ]
+}

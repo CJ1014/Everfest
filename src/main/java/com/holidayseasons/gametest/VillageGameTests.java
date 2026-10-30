@@ -17,7 +17,6 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.entity.schedule.Schedule;
@@ -101,7 +100,11 @@ public final class VillageGameTests {
         EverFestServer.require().director().assign(v, task);
         helper.startSequence()
                 .thenWaitUntil(() -> helper.assertTrue(task.isRunning(), "task starts"))
-                .thenExecute(() -> v.getBrain().setMemory(MemoryModuleType.HURT_BY, helper.getLevel().damageSources().generic()))
+                .thenExecute(() -> {
+                    // A zombie nearby (frozen so the test stays deterministic); vanilla's hostile sensor sees it.
+                    var zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(9, 2, 4));
+                    zombie.setNoAi(true);
+                })
                 .thenWaitUntil(() -> helper.assertTrue(v.getBrain().isActive(Activity.PANIC), "vanilla panic takes over"))
                 .thenWaitUntil(() -> helper.assertTrue(!task.isRunning() && EverFestServer.require().director().taskFor(v) == null,
                         "celebration stops while panicking"))

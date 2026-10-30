@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "fill=0": {
+      "model": "holidayseasons:block/candy_bowl_0"
+    },
+    "fill=1": {
+      "model": "holidayseasons:block/candy_bowl_1"
+    },
+    "fill=2": {
+      "model": "holidayseasons:block/candy_bowl_2"
+    },
+    "fill=3": {
+      "model": "holidayseasons:block/candy_bowl_3"
+    }
+  }
+}

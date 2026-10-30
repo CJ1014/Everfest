@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " S ",
+    "SSS",
+    "SSS"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:smooth_stone"
+    }
+  },
+  "result": {
+    "id": "holidayseasons:tombstone",
+    "count": 2
+  }
+}

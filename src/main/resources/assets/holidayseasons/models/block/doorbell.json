@@ -1,0 +1,77 @@
+{
+  "textures": {
+    "plate": "holidayseasons:block/doorbell",
+    "particle": "holidayseasons:block/doorbell"
+  },
+  "elements": [
+    {
+      "from": [
+        5,
+        0,
+        5
+      ],
+      "to": [
+        11,
+        2,
+        11
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            5,
+            5,
+            11,
+            11
+          ],
+          "texture": "#plate",
+          "cullface": "down"
+        },
+        "up": {
+          "uv": [
+            5,
+            5,
+            11,
+            11
+          ],
+          "texture": "#plate"
+        },
+        "north": {
+          "uv": [
+            5,
+            14,
+            11,
+            16
+          ],
+          "texture": "#plate"
+        },
+        "south": {
+          "uv": [
+            5,
+            14,
+            11,
+            16
+          ],
+          "texture": "#plate"
+        },
+        "west": {
+          "uv": [
+            5,
+            14,
+            11,
+            16
+          ],
+          "texture": "#plate"
+        },
+        "east": {
+          "uv": [
+            5,
+            14,
+            11,
+            16
+          ],
+          "texture": "#plate"
+        }
+      }
+    }
+  ]
+}

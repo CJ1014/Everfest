@@ -17,6 +17,11 @@ public final class EverFestClient {
     public EverFestClient(IEventBus modBus, ModContainer container) {
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAboveAll(EverFest.id("date_hud"), new DateHudLayer()));
+        modBus.addListener(com.holidayseasons.client.entity.HalloweenRenderers::registerLayers);
+        modBus.addListener(com.holidayseasons.client.entity.HalloweenRenderers::registerRenderers);
+        NeoForge.EVENT_BUS.addListener(HalloweenAtmosphere::onClientTick);
+        NeoForge.EVENT_BUS.addListener(HalloweenAtmosphere::onRenderFog);
+        NeoForge.EVENT_BUS.addListener(HalloweenAtmosphere::onFogColor);
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> {
             ClientCalendarState.clear();
             ClientHolidayState.clear();

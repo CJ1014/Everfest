@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "holidayseasons:block/holiday_hearth"
+    },
+    "facing=east": {
+      "model": "holidayseasons:block/holiday_hearth",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "holidayseasons:block/holiday_hearth",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "holidayseasons:block/holiday_hearth",
+      "y": 270
+    }
+  }
+}

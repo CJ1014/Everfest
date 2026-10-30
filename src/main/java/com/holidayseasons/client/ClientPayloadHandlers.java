@@ -38,6 +38,10 @@ public final class ClientPayloadHandlers {
         });
     }
 
+    public static void onOpenHearth(com.holidayseasons.network.OpenHearthPayload payload, IPayloadContext ctx) {
+        ctx.enqueueWork(() -> Minecraft.getInstance().setScreen(new com.holidayseasons.client.screen.HearthScreen(payload)));
+    }
+
     public static void onOpenScreen(OpenScreenPayload payload, IPayloadContext ctx) {
         ctx.enqueueWork(() -> {
             Minecraft mc = Minecraft.getInstance();

@@ -27,6 +27,16 @@ public final class VillageRecord {
         /** Day on which unloaded-time catch-up was last applied. */
         long catchUpDay = Long.MIN_VALUE;
         int villagersTakingPart;
+        /** Trick-or-treat visits per door this occurrence (so the same door is not knocked on endlessly). */
+        final Map<String, Integer> visits = new HashMap<>();
+
+        public int visits(String doorKey) {
+            return visits.getOrDefault(doorKey, 0);
+        }
+
+        public void recordVisit(String doorKey) {
+            visits.merge(doorKey, 1, Integer::sum);
+        }
 
         public int placed() {
             return placed;
@@ -87,6 +97,9 @@ public final class VillageRecord {
             ct.putInt("placed", c.placed);
             ct.putBoolean("centrepiece", c.centrepiece);
             ct.putLong("catchUp", c.catchUpDay);
+            CompoundTag v = new CompoundTag();
+            c.visits.forEach(v::putInt);
+            ct.put("visits", v);
             cs.put(occ, ct);
         });
         t.put("celebrations", cs);
@@ -104,6 +117,8 @@ public final class VillageRecord {
             c.placed = ct.getInt("placed");
             c.centrepiece = ct.getBoolean("centrepiece");
             c.catchUpDay = ct.getLong("catchUp");
+            CompoundTag v = ct.getCompound("visits");
+            for (String k : v.getAllKeys()) c.visits.put(k, v.getInt(k));
             r.celebrations.put(occ, c);
         }
         return r;
