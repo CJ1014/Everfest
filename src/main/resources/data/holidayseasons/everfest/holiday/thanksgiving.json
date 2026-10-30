@@ -1,0 +1,42 @@
+{
+  "date": "nth_weekday:11:thursday:4",
+  "duration_days": 1,
+  "preparation_days": 4,
+  "cleanup_days": 2,
+  "seasons": [
+    "autumn"
+  ],
+  "color": "#B5651D",
+  "behaviors": [
+    "decorate",
+    "gather",
+    "socialize",
+    "feast",
+    "harvest"
+  ],
+  "decorations": [
+    "harvest"
+  ],
+  "activities": [
+    "feast",
+    "harvest"
+  ],
+  "ambience": {
+    "music": "holidayseasons:music.harvest",
+    "ambient_sound": "",
+    "fog": "",
+    "particles": "falling_leaves"
+  },
+  "rewards": {
+    "reputation": 2,
+    "tokens": 2,
+    "items": []
+  },
+  "special_events": [
+    {
+      "id": "holidayseasons:harvest_merchant",
+      "daily_chance": 0.5
+    }
+  ],
+  "settings": {}
+}

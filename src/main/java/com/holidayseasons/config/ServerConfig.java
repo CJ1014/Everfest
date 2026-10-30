@@ -6,13 +6,23 @@ import com.holidayseasons.calendar.SeasonSyncPolicy;
 import com.holidayseasons.calendar.TimeJumpPolicy;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Server-authoritative settings, stored in {@code config/holidayseasons-server.toml}
  * and synchronised to clients by NeoForge. Only operators can change them at runtime.
  */
 public final class ServerConfig {
+    // Must be initialised before the spec is built in the static block below.
+    /** Built-in holidays with config sections, and whether each is enabled by default. */
+    public static final Map<String, Boolean> BUILT_IN_HOLIDAYS = Map.of(
+            "halloween", true, "christmas", true, "easter", true, "new_years", true,
+            "valentines", true, "thanksgiving", true, "independence_day", false);
+    public static final List<String> BUILT_IN_ORDER = List.of(
+            "new_years", "valentines", "easter", "independence_day", "halloween", "thanksgiving", "christmas");
+
     public static final ModConfigSpec SPEC;
     public static final ServerConfig INSTANCE;
 
@@ -37,6 +47,40 @@ public final class ServerConfig {
     public final ModConfigSpec.BooleanValue warnOnSeasonMismatch;
     // sync / performance
     public final ModConfigSpec.IntValue clientSyncIntervalTicks;
+    // holidays
+    public final ModConfigSpec.BooleanValue announceHolidays;
+    public final ModConfigSpec.ConfigValue<List<? extends String>> disabledHolidays;
+    public final ModConfigSpec.IntValue historyYears;
+    public final Map<String, HolidayOverrides> holidays = new LinkedHashMap<>();
+
+
+    /** Per-holiday overrides for a built-in holiday. Negative numbers / empty strings mean "use the datapack value". */
+    public static final class HolidayOverrides {
+        public final ModConfigSpec.BooleanValue enabled;
+        public final ModConfigSpec.ConfigValue<String> dateRule;
+        public final ModConfigSpec.IntValue preparationDays;
+        public final ModConfigSpec.IntValue durationDays;
+        public final ModConfigSpec.IntValue cleanupDays;
+        public final ModConfigSpec.DoubleValue intensity;
+
+        HolidayOverrides(ModConfigSpec.Builder b, String id, boolean enabledByDefault) {
+            String t = "holidayseasons.configuration.holiday.";
+            b.push(id);
+            enabled = b.translation(t + "enabled").define("enabled", enabledByDefault);
+            dateRule = b.comment("Date rule override, e.g. fixed:10-31, nth_weekday:11:thursday:4, easter:0, native:4-3,",
+                            "season:mid_spring:0.5. Empty = use the holiday's datapack definition.")
+                    .translation(t + "dateRule").define("dateRule", "");
+            preparationDays = b.comment("Days of preparation before the holiday. -1 = datapack default.")
+                    .translation(t + "preparationDays").defineInRange("preparationDays", -1, -1, 60);
+            durationDays = b.comment("Celebration length in days. -1 = datapack default.")
+                    .translation(t + "durationDays").defineInRange("durationDays", -1, -1, 60);
+            cleanupDays = b.comment("Days over which temporary decorations disappear afterwards. -1 = datapack default.")
+                    .translation(t + "cleanupDays").defineInRange("cleanupDays", -1, -1, 60);
+            intensity = b.comment("Celebration intensity: scales how many villagers take part and how much they decorate.")
+                    .translation(t + "intensity").defineInRange("intensity", 1.0, 0.0, 2.0);
+            b.pop();
+        }
+    }
 
     private ServerConfig(ModConfigSpec.Builder b) {
         b.comment("Calendar settings. The server is authoritative; clients only display what it sends.").push("calendar");
@@ -94,6 +138,22 @@ public final class ServerConfig {
         clientSyncIntervalTicks = b.comment("Ticks between periodic calendar syncs to clients (changes are always sent immediately).")
                 .translation("holidayseasons.configuration.clientSyncIntervalTicks")
                 .defineInRange("clientSyncIntervalTicks", 200, 20, 6000);
+        b.pop();
+
+        b.comment("Holiday schedule. Built-in holidays can be tuned here; datapacks can add more under",
+                "data/<namespace>/everfest/holiday/<name>.json.").push("holidays");
+        announceHolidays = b.comment("Announce holiday preparation and start in chat.")
+                .translation("holidayseasons.configuration.announceHolidays")
+                .define("announceHolidays", true);
+        disabledHolidays = b.comment("Ids of datapack holidays to disable, e.g. [\"mypack:harvest_moon\"].")
+                .translation("holidayseasons.configuration.disabledHolidays")
+                .defineListAllowEmpty("disabledHolidays", List.of(), () -> "namespace:holiday", o -> o instanceof String);
+        historyYears = b.comment("Years of holiday history to keep (prevents re-celebrating after large time rewinds).")
+                .translation("holidayseasons.configuration.historyYears")
+                .defineInRange("historyYears", 3, 1, 50);
+        for (String id : BUILT_IN_ORDER) {
+            holidays.put(id, new HolidayOverrides(b, id, BUILT_IN_HOLIDAYS.get(id)));
+        }
         b.pop();
     }
 

@@ -1,0 +1,37 @@
+{
+  "date": "fixed:2-14",
+  "duration_days": 1,
+  "preparation_days": 3,
+  "cleanup_days": 2,
+  "seasons": [
+    "winter"
+  ],
+  "color": "#E84A7F",
+  "behaviors": [
+    "decorate",
+    "gather",
+    "socialize",
+    "gift_exchange"
+  ],
+  "decorations": [
+    "valentines"
+  ],
+  "activities": [
+    "chocolates",
+    "flowers",
+    "gift_exchange"
+  ],
+  "ambience": {
+    "music": "holidayseasons:music.valentines",
+    "ambient_sound": "",
+    "fog": "",
+    "particles": "hearts"
+  },
+  "rewards": {
+    "reputation": 2,
+    "tokens": 1,
+    "items": []
+  },
+  "special_events": [],
+  "settings": {}
+}

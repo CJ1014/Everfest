@@ -17,6 +17,9 @@ public final class EverFestClient {
     public EverFestClient(IEventBus modBus, ModContainer container) {
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAboveAll(EverFest.id("date_hud"), new DateHudLayer()));
-        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> ClientCalendarState.clear());
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> {
+            ClientCalendarState.clear();
+            ClientHolidayState.clear();
+        });
     }
 }

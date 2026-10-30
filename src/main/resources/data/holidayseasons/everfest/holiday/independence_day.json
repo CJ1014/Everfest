@@ -1,0 +1,38 @@
+{
+  "date": "fixed:7-4",
+  "enabled": false,
+  "duration_days": 1,
+  "preparation_days": 2,
+  "cleanup_days": 2,
+  "seasons": [
+    "summer"
+  ],
+  "color": "#3C5AA6",
+  "behaviors": [
+    "decorate",
+    "gather",
+    "socialize",
+    "fireworks",
+    "feast"
+  ],
+  "decorations": [
+    "independence_day"
+  ],
+  "activities": [
+    "fireworks",
+    "parties"
+  ],
+  "ambience": {
+    "music": "holidayseasons:music.summer",
+    "ambient_sound": "",
+    "fog": "",
+    "particles": ""
+  },
+  "rewards": {
+    "reputation": 1,
+    "tokens": 1,
+    "items": []
+  },
+  "special_events": [],
+  "settings": {}
+}

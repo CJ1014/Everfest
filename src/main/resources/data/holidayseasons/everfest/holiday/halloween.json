@@ -1,0 +1,56 @@
+{
+  "date": "fixed:10-31",
+  "duration_days": 1,
+  "preparation_days": 4,
+  "cleanup_days": 3,
+  "seasons": [
+    "autumn"
+  ],
+  "color": "#E8751A",
+  "behaviors": [
+    "decorate",
+    "gather",
+    "socialize",
+    "trick_or_treat",
+    "hand_out_candy",
+    "visit_homes",
+    "wear_costumes"
+  ],
+  "decorations": [
+    "halloween"
+  ],
+  "activities": [
+    "trick_or_treat",
+    "pumpkin_carving",
+    "candy_bowl",
+    "costumes"
+  ],
+  "ambience": {
+    "music": "holidayseasons:music.halloween",
+    "ambient_sound": "holidayseasons:ambient.halloween",
+    "fog": "halloween",
+    "particles": "falling_leaves"
+  },
+  "rewards": {
+    "reputation": 3,
+    "tokens": 2,
+    "items": [
+      "holidayseasons:candy_corn"
+    ]
+  },
+  "special_events": [
+    {
+      "id": "holidayseasons:mysterious_visitor",
+      "daily_chance": 0.25
+    },
+    {
+      "id": "holidayseasons:ghost_lights",
+      "daily_chance": 0.5
+    }
+  ],
+  "settings": {
+    "max_trick_or_treat_groups": 3,
+    "group_size_max": 3,
+    "visit_radius": 48
+  }
+}

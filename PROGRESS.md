@@ -27,7 +27,7 @@ uses Modrinth version ids, which pin the NeoForge files.
 * SS is an **optional** dependency: EverFest compiles against it, runs with it in dev, and falls back to
   calendar-derived seasons without it (verified, see below).
 
-## Current milestone: 1 — Foundation ✅ (acceptance criteria verified)
+## Milestone 1 — Foundation ✅ (acceptance criteria verified)
 
 ### Completed systems
 * **Project**: ModDevGradle build, Gradle 8.14.3 wrapper, mod metadata, optional SS dependency, JUnit 5,
@@ -91,7 +91,62 @@ uses Modrinth version ids, which pin the NeoForge files.
 * NeoForge's built-in config screen cannot edit SERVER configs while connected to a remote server; an
   operator-only in-game admin screen is planned (Milestone 8). Operators can use `/everfest` commands meanwhile.
 
+## Milestone 2 — Holiday engine ✅ (acceptance criteria verified)
+
+### Completed systems
+* **Date rules** (`holiday.rule`, pure): `fixed:MM-DD` (Gregorian, scaled to native months), `nth_weekday:MM:day:N`
+  (N = -1 for last; missing 5th → last), `easter:OFFSET` (Meeus/Jones/Butcher computus), `native:MM-DD`,
+  `season:sub_season:FRACTION`. Text form round-trips and is used in JSON and config.
+* **Data-driven holidays**: `data/<ns>/everfest/holiday/<name>.json`, DFU codec (`HolidayDefinition`) with date rule,
+  duration, preparation, cleanup, enabled, seasons, colour, behaviours, decorations, activities, ambience, rewards,
+  special events and free-form settings. Invalid files are logged and skipped. Datapacks can add or replace holidays.
+* **Built-in holidays**: Halloween (Oct 31), Christmas (Dec 25), Easter (computus), New Year's (Dec 31 + Jan 1, for the
+  midnight countdown), Valentine's Day (Feb 14), Thanksgiving (4th Thursday of November), Independence Day (Jul 4,
+  **disabled by default**).
+* **Server config** `[holidays]`: per built-in holiday `enabled`, `dateRule` override, `preparationDays`,
+  `durationDays`, `cleanupDays`, `intensity`; plus `announceHolidays`, `disabledHolidays` (datapack ids),
+  `historyYears`. Config and datapack reloads re-schedule live.
+* **Lifecycle engine** (`HolidayEngineCore`, pure): INACTIVE → PREPARING → ACTIVE → CLEANUP → COMPLETED.
+  Deterministic and idempotent. Occurrences are keyed by holiday + calendar signature + year. Forward jumps emit every
+  intermediate phase flagged `transientStep`; jumping completely past an occurrence never starts it; COMPLETED is
+  terminal; rewinding before preparation ABORTs a live occurrence to INACTIVE; an occurrence that has already been
+  celebrated never prepares or activates again; disabled/removed holidays and calendar-system changes ABORT live
+  occurrences; `REQUIRE_MATCHING_SEASON` SKIPs out-of-season occurrences; durations are clamped in tiny calendars.
+* **Scheduling** respects `syncPolicy`: FOLLOW_SEASON schedules on the Serene Seasons cycle.
+* **Persistence**: `holidayseasons_holidays.dat`; history pruned after `historyYears`.
+* **Events**: `HolidayPhaseChangedEvent` (game bus) for every transition — the hook Milestone 3+ systems use.
+* **Players**: chat announcements + client toasts on preparation/start; calendar shows preparation days and holiday
+  days with tooltips; sidebar countdowns; `HolidayStatusPayload` sync on login and on change.
+* **Commands**: `/everfest holiday list|info <h>`; operators: `goto <h> [prepare|start]`, `reset <h>`, `finish <h>`.
+* **Fix found by GameTest logs**: Serene Seasons date changes take two ticks (season set, then clock delta); date
+  events are now held until SS reaches the target so holidays never react to the intermediate date.
+
+### Test results
+* **Unit tests — 50/50 passing** (now run inside the FML JUnit environment via ModDevGradle `unitTest`):
+  computus for known years + every year 1900–2399 is a Sunday in range; Thanksgiving 2024–2026; last/5th weekday;
+  scaled dates; rule parse/describe round trips and rejection of invalid rules; all 7 bundled JSON files parse;
+  window phases; day-by-day progression emits each phase once and is idempotent; jump past / jump into;
+  rewind after completion; rewind-abort-replay never re-prepares or re-activates; year-boundary occurrence;
+  disable / calendar change / season mismatch; tiny calendar clamping; pruning; **20,000-step randomized time
+  travel across 4 holidays: every occurrence activated at most once**.
+* **GameTests — 4/4 passing** (`./gradlew runGameTestServer`): wall calendar breaks when its support is removed;
+  wall calendar cannot be placed floating; full lifecycle in a live world via real Serene Seasons date changes
+  (PREPARING → ACTIVE → rewind ABORT → replay COMPLETED, ACTIVE entered exactly once, records survive NBT
+  save/load); `/time add 24000` advances exactly one calendar day.
+  Note: Gradle's `runGameTestServer` exits 0 even if mod loading crashes — always check the log for
+  `All N required tests passed`.
+* **Dedicated server + client**: `/everfest holiday list` correct for the 96-day year; `goto halloween prepare` →
+  PREPARING; **restart produced zero transitions** and Halloween stayed PREPARING; on the client, `goto halloween
+  start` showed the chat announcement, toast and HUD; calendar showed prep days, holiday marker and countdowns.
+
+### Known issues / limitations (M2)
+* Holiday occurrences that fall in the past when a world first loads are displayed as COMPLETED but were never
+  celebrated (by design — no retroactive celebrations).
+* `/everfest holiday goto` is refused under FOLLOW_SEASON when the scheduling calendar differs from the displayed one.
+
+## Current milestone: 3 — Autonomous villages
+
 ## Next tasks
-* Milestone 2 — holiday engine: data-driven holiday definitions, date rules (fixed, nth weekday, Easter, season
-  relative), idempotent persisted lifecycle, scheduler on the scheduling calendar (respecting `syncPolicy`),
-  per-holiday config, `/everfest holiday` commands, client holiday sync, unit tests + GameTests.
+* Village registry and celebration state (incl. abstract progress for unloaded villages), deterministic villager
+  personalities, holiday Brain behaviours that coexist with vanilla schedules, biome themes, temporary decoration
+  ledger with safe restore, GameTests.

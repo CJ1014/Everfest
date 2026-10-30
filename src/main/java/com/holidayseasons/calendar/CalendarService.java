@@ -31,6 +31,14 @@ public final class CalendarService {
     @Nullable
     private CalendarSnapshot seasonSchedule;
     private long ticksSinceSync;
+    /**
+     * Target of an in-flight Serene Seasons date change. Setting an SS date takes two steps (season set, then the clock
+     * delta is applied on SS's next tick); date events are held until SS reaches the target so holidays never react
+     * to the intermediate date.
+     */
+    @Nullable
+    private CalendarDate pendingSeasonTarget;
+    private int pendingTicksLeft;
 
     public CalendarService(MinecraftServer server) {
         this.server = server;
@@ -92,6 +100,16 @@ public final class CalendarService {
         reading.ifPresent(this::trackSeasonYear);
 
         CalendarSnapshot next = computeSnapshot(reading.orElse(null), dayTime);
+        if (pendingSeasonTarget != null) {
+            if (next.date().equals(pendingSeasonTarget) || --pendingTicksLeft <= 0) {
+                if (!next.date().equals(pendingSeasonTarget)) {
+                    EverFest.LOGGER.warn("EverFest: Serene Seasons did not reach {} (now {})", pendingSeasonTarget, next.date());
+                }
+                pendingSeasonTarget = null;
+            } else {
+                return;
+            }
+        }
         CalendarSnapshot previous = current;
         current = next;
         seasonSchedule = reading.map(r -> seasonSnapshot(r, dayTime)).orElse(null);
@@ -316,6 +334,8 @@ public final class CalendarService {
                     long subTicks = r.subSeasonTicks();
                     data.seasonYear = target.year();
                     data.lastSeasonYearTicks = SeasonCycleMapper.yearTicks(sub.ordinal() * subTicks + (target.day() - 1L) * r.dayDuration(), subTicks);
+                    pendingSeasonTarget = target;
+                    pendingTicksLeft = 100;
                 }
             }
         }

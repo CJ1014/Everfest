@@ -19,5 +19,9 @@ public final class EverFestNetwork {
                 (p, ctx) -> com.holidayseasons.client.ClientPayloadHandlers.onCalendarSync(p, ctx));
         r.playToClient(OpenScreenPayload.TYPE, OpenScreenPayload.STREAM_CODEC,
                 (p, ctx) -> com.holidayseasons.client.ClientPayloadHandlers.onOpenScreen(p, ctx));
+        r.playToClient(HolidayStatusPayload.TYPE, HolidayStatusPayload.STREAM_CODEC,
+                (p, ctx) -> com.holidayseasons.client.ClientPayloadHandlers.onHolidayStatus(p, ctx));
+        r.playToClient(HolidayNoticePayload.TYPE, HolidayNoticePayload.STREAM_CODEC,
+                (p, ctx) -> com.holidayseasons.client.ClientPayloadHandlers.onHolidayNotice(p, ctx));
     }
 }

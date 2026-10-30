@@ -1,0 +1,46 @@
+{
+  "date": "fixed:12-25",
+  "duration_days": 1,
+  "preparation_days": 5,
+  "cleanup_days": 3,
+  "seasons": [
+    "winter"
+  ],
+  "color": "#C0392B",
+  "behaviors": [
+    "decorate",
+    "gather",
+    "socialize",
+    "gift_exchange",
+    "visit_homes",
+    "feast"
+  ],
+  "decorations": [
+    "christmas"
+  ],
+  "activities": [
+    "presents",
+    "tree_decorating",
+    "wish_lists"
+  ],
+  "ambience": {
+    "music": "holidayseasons:music.christmas",
+    "ambient_sound": "holidayseasons:ambient.winter_village",
+    "fog": "",
+    "particles": "flurries"
+  },
+  "rewards": {
+    "reputation": 3,
+    "tokens": 2,
+    "items": []
+  },
+  "special_events": [
+    {
+      "id": "holidayseasons:mysterious_gift_delivery",
+      "daily_chance": 0.35
+    }
+  ],
+  "settings": {
+    "gift_exchange_rounds": 2
+  }
+}

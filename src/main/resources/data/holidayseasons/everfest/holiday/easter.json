@@ -1,0 +1,44 @@
+{
+  "date": "easter:0",
+  "duration_days": 1,
+  "preparation_days": 3,
+  "cleanup_days": 2,
+  "seasons": [
+    "spring"
+  ],
+  "color": "#D68FD6",
+  "behaviors": [
+    "decorate",
+    "gather",
+    "socialize",
+    "egg_hunt",
+    "hide_eggs"
+  ],
+  "decorations": [
+    "easter"
+  ],
+  "activities": [
+    "egg_hunt",
+    "baskets"
+  ],
+  "ambience": {
+    "music": "holidayseasons:music.spring",
+    "ambient_sound": "",
+    "fog": "",
+    "particles": "petals"
+  },
+  "rewards": {
+    "reputation": 2,
+    "tokens": 2,
+    "items": []
+  },
+  "special_events": [
+    {
+      "id": "holidayseasons:golden_egg",
+      "daily_chance": 0.15
+    }
+  ],
+  "settings": {
+    "eggs_per_village": 12
+  }
+}

@@ -2,6 +2,7 @@ package com.holidayseasons.server;
 
 import com.holidayseasons.EverFest;
 import com.holidayseasons.calendar.CalendarService;
+import com.holidayseasons.holiday.HolidayService;
 import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,10 +16,12 @@ public final class EverFestServer {
 
     private final MinecraftServer server;
     private final CalendarService calendar;
+    private final HolidayService holidays;
 
     private EverFestServer(MinecraftServer server) {
         this.server = server;
         this.calendar = new CalendarService(server);
+        this.holidays = new HolidayService(server, calendar);
     }
 
     public static void start(MinecraftServer server) {
@@ -48,7 +51,12 @@ public final class EverFestServer {
         return calendar;
     }
 
+    public HolidayService holidays() {
+        return holidays;
+    }
+
     public void tick() {
         calendar.tick();
+        holidays.tick();
     }
 }

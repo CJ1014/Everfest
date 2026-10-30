@@ -1,0 +1,40 @@
+{
+  "date": "fixed:12-31",
+  "duration_days": 2,
+  "preparation_days": 2,
+  "cleanup_days": 2,
+  "seasons": [
+    "winter"
+  ],
+  "color": "#D4AF37",
+  "behaviors": [
+    "decorate",
+    "gather",
+    "socialize",
+    "fireworks",
+    "party"
+  ],
+  "decorations": [
+    "new_years"
+  ],
+  "activities": [
+    "countdown",
+    "fireworks",
+    "parties"
+  ],
+  "ambience": {
+    "music": "holidayseasons:music.new_years",
+    "ambient_sound": "",
+    "fog": "",
+    "particles": "confetti"
+  },
+  "rewards": {
+    "reputation": 2,
+    "tokens": 1,
+    "items": []
+  },
+  "special_events": [],
+  "settings": {
+    "countdown_time": 18000
+  }
+}

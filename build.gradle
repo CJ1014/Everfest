@@ -94,6 +94,12 @@ neoForge {
             sourceSet(sourceSets.main)
         }
     }
+
+    // Run JUnit tests inside the FML test environment so tests can use Minecraft/DFU classes.
+    unitTest {
+        enable()
+        testedMod = mods."${mod_id}"
+    }
 }
 
 configurations {

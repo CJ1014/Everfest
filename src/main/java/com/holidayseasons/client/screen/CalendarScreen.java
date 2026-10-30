@@ -173,7 +173,9 @@ public class CalendarScreen extends Screen {
         int offset = firstWeekdayOffset();
         int len = system.monthLength(viewYear, viewMonth);
         HolidayStatus hovered = null;
-        List<HolidayStatus> holidays = ClientHolidayState.statuses();
+        // Holiday dates can only be drawn on the grid when they belong to the displayed calendar system.
+        List<HolidayStatus> holidays = ClientHolidayState.signature().equals(s.systemSignature())
+                ? ClientHolidayState.statuses() : List.of();
         for (int day = 1; day <= len; day++) {
             int cell = offset + day - 1;
             int row = cell / 7 - rowScroll;
@@ -238,9 +240,11 @@ public class CalendarScreen extends Screen {
             return;
         }
         int shown = 0;
+        java.util.Set<String> seen = new java.util.HashSet<>();
         for (HolidayStatus h : list) {
-            if (shown >= 8 || y > top + PANEL_H - 40) break;
-            if (h.phase() == HolidayPhase.COMPLETED) continue;
+            if (shown >= 7 || y > top + PANEL_H - 40) break;
+            if (h.phase() == HolidayPhase.COMPLETED || (h.daysUntilStart() < 0 && h.phase() == HolidayPhase.INACTIVE)) continue;
+            if (!seen.add(h.id())) continue;
             g.fill(sx, y + 1, sx + 5, y + 6, h.color() | 0xFF000000);
             g.drawString(font, Component.translatable(h.translationKey()), sx + 8, y, INK, false);
             y += 9;
