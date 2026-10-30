@@ -1,0 +1,30 @@
+# gradle
+.gradle/
+build/
+out/
+classes/
+repo/
+
+# idea / eclipse / vscode
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+bin/
+.vscode/
+
+# runs
+run/
+run-data/
+run-gametest/
+run-*/
+runs/
+
+# datagen cache
+src/generated/**/.cache
+
+# os
+.DS_Store

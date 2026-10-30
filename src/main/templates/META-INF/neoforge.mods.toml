@@ -1,0 +1,38 @@
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+issueTrackerURL="https://github.com/cj1014/everfest/issues"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+logoFile="everfest_logo.png"
+authors="CJ"
+description='''
+EverFest: a living holiday calendar for Minecraft.
+Villages prepare for and celebrate holidays all year round - trick-or-treating, gift exchanges,
+festivals, decorations and seasonal wildlife - synchronized with Serene Seasons when it is installed.
+'''
+
+[[dependencies.${mod_id}]]
+    modId="neoforge"
+    type="required"
+    versionRange="${neo_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+# Serene Seasons is the recommended seasonal foundation. Without it EverFest derives seasons from its own calendar.
+[[dependencies.${mod_id}]]
+    modId="sereneseasons"
+    type="optional"
+    versionRange="[10.1.0.0,)"
+    ordering="AFTER"
+    side="BOTH"
