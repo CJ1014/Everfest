@@ -187,6 +187,27 @@ public final class CelebrationDirector {
         assignedAt.put(v.getUUID(), v.level().getGameTime());
     }
 
+    /**
+     * The village a villager belongs to. Vanilla only lets adults remember the village bell (meeting point), so
+     * children - and adults that have not found the bell yet - join the nearest known bell village within 64 blocks.
+     */
+    public VillageKeys.Resolved resolveVillage(Villager v) {
+        VillageKeys.Resolved own = VillageKeys.of(v);
+        if (own.hasBell()) return own;
+        String dim = v.level().dimension().location().toString();
+        LiveVillage best = null;
+        double bestDist = 64 * 64;
+        for (LiveVillage lv : live.values()) {
+            if (!lv.hasBell || lv.centre == null || !lv.key.startsWith(dim + "|")) continue;
+            double d = lv.centre.distSqr(v.blockPosition());
+            if (d < bestDist) {
+                best = lv;
+                bestDist = d;
+            }
+        }
+        return best == null ? own : new VillageKeys.Resolved(best.key, best.centre, true);
+    }
+
     /** Beds of a loaded village's villagers (their houses), for door-to-door activities. */
     public List<BlockPos> homesOf(String villageKey) {
         LiveVillage lv = live.get(villageKey);
@@ -304,7 +325,7 @@ public final class CelebrationDirector {
     private void processVillager(Villager v, @Nullable Festival f, long today) {
         ServerLevel level = (ServerLevel) v.level();
         HolidayBrainInjector.ensure(v, this);
-        VillageKeys.Resolved rk = VillageKeys.of(v);
+        VillageKeys.Resolved rk = resolveVillage(v);
         LiveVillage lv = live.computeIfAbsent(rk.key(), LiveVillage::new);
         lv.centre = rk.centre();
         lv.hasBell = rk.hasBell();

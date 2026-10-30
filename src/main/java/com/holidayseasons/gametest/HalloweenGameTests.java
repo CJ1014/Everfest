@@ -252,6 +252,23 @@ public final class HalloweenGameTests {
     }
 
     @GameTest(template = "plot_16x16")
+    public static void playersHandCandyToChildren(GameTestHelper helper) {
+        EverFestServer s = EverFestServer.require();
+        Villager kid = child(helper, new BlockPos(8, 2, 8));
+        Villager adult = helper.spawn(EntityType.VILLAGER, new BlockPos(4, 2, 4));
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        ItemStack candy = new ItemStack(EverFestItems.GUMMY_BAT.get(), 3);
+        String village = s.director().resolveVillage(kid).key();
+        int before = s.reputation().get(player.getUUID(), village);
+        helper.assertTrue(s.halloween().playerGivesCandy(player, kid, candy), "children accept candy");
+        helper.assertTrue(candy.getCount() == 2, "one candy is handed over");
+        helper.assertTrue(s.reputation().get(player.getUUID(), village) > before, "giving candy earns village reputation");
+        helper.assertTrue(!s.halloween().playerGivesCandy(player, adult, candy) && candy.getCount() == 2, "adults keep trading as usual");
+        helper.assertTrue(!s.halloween().playerGivesCandy(player, kid, new ItemStack(Items.DIRT)), "only candy counts");
+        helper.succeed();
+    }
+
+    @GameTest(template = "plot_16x16")
     public static void halloweenCreaturesOnlyOnHalloweenNight(GameTestHelper helper) {
         HalloweenService service = EverFestServer.require().halloween();
         var ghost = helper.spawn(EverFestEntities.GHOST.get(), new BlockPos(8, 4, 8));

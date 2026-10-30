@@ -15,7 +15,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 /** Owner settings for a registered home. All changes are validated by the server. */
 public class HearthScreen extends Screen {
     private static final int W = 260;
-    private static final int H = 176;
+    private static final int H = 192;
     private final OpenHearthPayload data;
     private EditBox name;
     private boolean acceptVisitors;

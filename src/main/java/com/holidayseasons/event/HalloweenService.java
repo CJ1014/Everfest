@@ -337,7 +337,7 @@ public final class HalloweenService {
     }
 
     /** A player hands candy to a village child: the child is delighted, and if its group is waiting, that's a treat. */
-    public boolean playerGivesCandy(ServerPlayer player, Villager child, ItemStack candy) {
+    public boolean playerGivesCandy(Player player, Villager child, ItemStack candy) {
         if (!child.isBaby() || !candy.is(EverFestItems.CANDY_TAG)) return false;
         ServerLevel level = (ServerLevel) child.level();
         ItemStack given = candy.copyWithCount(1);
@@ -345,7 +345,7 @@ public final class HalloweenService {
         level.sendParticles(ParticleTypes.HEART, child.getX(), child.getY() + child.getBbHeight() + 0.3, child.getZ(), 3, 0.3, 0.2, 0.3, 0);
         level.playSound(null, child.getX(), child.getY(), child.getZ(), SoundEvents.VILLAGER_CELEBRATE, SoundSource.NEUTRAL, 0.8f, 1.6f);
         level.playSound(null, child.getX(), child.getY(), child.getZ(), EverFestSounds.CANDY.get(), SoundSource.NEUTRAL, 0.7f, 1.2f);
-        String village = com.holidayseasons.village.VillageKeys.of(child).key();
+        String village = services.director().resolveVillage(child).key();
         services.reputation().add(player.getUUID(), village, ReputationMath.Action.GAVE_CANDY, services.calendar().snapshot().epochDay());
         for (List<TrickOrTreatGroup> l : groupsByVillage.values()) {
             for (TrickOrTreatGroup g : l) {
@@ -437,6 +437,15 @@ public final class HalloweenService {
     /** Creatures saved in chunks that load after Halloween night are removed before they appear. */
     public boolean shouldRejectCreature(Entity e) {
         return e.getTags().contains(CREATURE_TAG) && !isHalloweenNight();
+    }
+
+    /** Leader position and phase of each group that is out, for diagnostics. */
+    public List<String> describeGroups() {
+        List<String> out = new ArrayList<>();
+        groupsByVillage.forEach((village, list) -> list.stream().filter(TrickOrTreatGroup::isActive).forEach(g ->
+                out.add(g.size() + " children at " + g.leader.blockPosition().toShortString() + " " + g.phase
+                        + (g.current == null ? "" : " -> " + g.current.key()) + ", treats " + g.treats + ", tricks " + g.tricks)));
+        return out;
     }
 
     /** For diagnostics. */

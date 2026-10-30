@@ -132,8 +132,7 @@ public final class EverFest {
         if (event.getLevel().isClientSide() || !(event.getTarget() instanceof net.minecraft.world.entity.npc.Villager child)) return;
         if (!child.isBaby() || !event.getItemStack().is(com.holidayseasons.item.EverFestItems.CANDY_TAG)) return;
         EverFestServer s = EverFestServer.get();
-        if (s != null && event.getEntity() instanceof ServerPlayer player
-                && s.halloween().playerGivesCandy(player, child, event.getItemStack())) {
+        if (s != null && s.halloween().playerGivesCandy(event.getEntity(), child, event.getItemStack())) {
             event.setCanceled(true);
             event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
         }

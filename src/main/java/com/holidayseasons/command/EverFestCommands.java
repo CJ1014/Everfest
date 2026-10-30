@@ -42,6 +42,7 @@ public final class EverFestCommands {
         root.then(Commands.literal("halloween").requires(s -> s.hasPermission(ADMIN_LEVEL)).executes(EverFestCommands::halloweenStatus));
         root.then(Commands.literal("home")
                 .then(Commands.literal("list").executes(EverFestCommands::listHomes))
+                .then(Commands.literal("edit").executes(EverFestCommands::editHome))
                 .then(Commands.literal("register").requires(s -> s.hasPermission(ADMIN_LEVEL))
                         .then(Commands.argument("pos", net.minecraft.commands.arguments.coordinates.BlockPosArgument.blockPos())
                                 .then(Commands.argument("owner", net.minecraft.commands.arguments.EntityArgument.player())
@@ -137,6 +138,23 @@ public final class EverFestCommands {
         ctx.getSource().sendSuccess(() -> Component.literal("Halloween: " + (h.halloween() == null ? "not live" : h.halloween().phase())
                 + "  night: " + h.isHalloweenNight() + "  trick-or-treat groups out: " + h.activeGroups()
                 + "  adults handing out candy: " + h.giverCount()), false);
+        h.describeGroups().forEach(line -> ctx.getSource().sendSuccess(() -> Component.literal(" " + line), false));
+        return 1;
+    }
+
+    private static int editHome(CommandContext<CommandSourceStack> ctx) {
+        ServerPlayer p = ctx.getSource().getPlayer();
+        if (p == null) return 0;
+        var homes = EverFestServer.require().homes();
+        var home = homes.ownedBy(p.getUUID()).stream()
+                .filter(h -> h.dimension == p.level().dimension() && h.hearth.distSqr(p.blockPosition()) < 16 * 16)
+                .findFirst().orElse(null);
+        if (home == null) {
+            ctx.getSource().sendFailure(Component.translatable("holidayseasons.home.none_nearby"));
+            return 0;
+        }
+        homes.refreshEntrance(p.serverLevel(), home);
+        PacketDistributor.sendToPlayer(p, com.holidayseasons.network.OpenHearthPayload.of(home));
         return 1;
     }
 

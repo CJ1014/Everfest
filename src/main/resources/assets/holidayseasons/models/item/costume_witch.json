@@ -289,15 +289,6 @@
           ],
           "texture": "#hat"
         }
-      },
-      "rotation": {
-        "angle": 11.25,
-        "axis": "z",
-        "origin": [
-          8,
-          19.5,
-          8
-        ]
       }
     },
     {
