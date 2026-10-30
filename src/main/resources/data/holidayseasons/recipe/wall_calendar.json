@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [" S ", "PPP", "PIP"],
+  "key": {
+    "S": { "item": "minecraft:string" },
+    "P": { "item": "minecraft:paper" },
+    "I": { "item": "minecraft:ink_sac" }
+  },
+  "result": { "id": "holidayseasons:wall_calendar", "count": 1 }
+}

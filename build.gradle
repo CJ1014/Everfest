@@ -53,6 +53,19 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
+        // Multiplayer test clients: separate game directories, auto-join a dev server on localhost.
+        // ./gradlew runClientA  /  ./gradlew runClientB   (start ./gradlew runServer first)
+        clientA {
+            client()
+            gameDirectory = project.file('run-clientA')
+            programArguments.addAll '--username', 'FestTesterA', '--width', '1280', '--height', '720', '--quickPlayMultiplayer', 'localhost:25565'
+        }
+        clientB {
+            client()
+            gameDirectory = project.file('run-clientB')
+            programArguments.addAll '--username', 'FestTesterB', '--width', '1280', '--height', '720', '--quickPlayMultiplayer', 'localhost:25565'
+        }
+
         server {
             server()
             programArgument '--nogui'
@@ -91,8 +104,11 @@ dependencies {
     // Serene Seasons is an optional integration: compiled against, present in dev runs, not forced on dependents.
     compileOnly "maven.modrinth:serene-seasons:${serene_seasons_modrinth_id}"
     compileOnly "maven.modrinth:glitchcore:${glitchcore_modrinth_id}"
-    localRuntime "maven.modrinth:serene-seasons:${serene_seasons_modrinth_id}"
-    localRuntime "maven.modrinth:glitchcore:${glitchcore_modrinth_id}"
+    // Pass -PnoSereneSeasons to test EverFest's fallback behaviour without the integration installed.
+    if (!project.hasProperty('noSereneSeasons')) {
+        localRuntime "maven.modrinth:serene-seasons:${serene_seasons_modrinth_id}"
+        localRuntime "maven.modrinth:glitchcore:${glitchcore_modrinth_id}"
+    }
 
     testImplementation platform('org.junit:junit-bom:5.10.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'

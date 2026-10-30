@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "holidayseasons:block/wall_calendar" },
+    "facing=east": { "model": "holidayseasons:block/wall_calendar", "y": 90 },
+    "facing=south": { "model": "holidayseasons:block/wall_calendar", "y": 180 },
+    "facing=west": { "model": "holidayseasons:block/wall_calendar", "y": 270 }
+  }
+}

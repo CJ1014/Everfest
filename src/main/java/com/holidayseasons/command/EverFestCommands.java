@@ -1,0 +1,129 @@
+package com.holidayseasons.command;
+
+import com.holidayseasons.calendar.CalendarDate;
+import com.holidayseasons.calendar.CalendarMode;
+import com.holidayseasons.calendar.CalendarService;
+import com.holidayseasons.calendar.CalendarSnapshot;
+import com.holidayseasons.network.OpenScreenPayload;
+import com.holidayseasons.server.EverFestServer;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.PacketDistributor;
+
+import java.util.Locale;
+
+/** {@code /everfest} - player-facing calendar queries and operator date controls. */
+public final class EverFestCommands {
+    public static final int ADMIN_LEVEL = 2;
+
+    private EverFestCommands() {
+    }
+
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("everfest");
+        root.then(Commands.literal("calendar").executes(EverFestCommands::openCalendar));
+        root.then(Commands.literal("date")
+                .executes(EverFestCommands::showDate)
+                .then(Commands.literal("info").executes(EverFestCommands::showInfo))
+                .then(Commands.literal("set").requires(s -> s.hasPermission(ADMIN_LEVEL))
+                        .then(Commands.argument("date", StringArgumentType.word()).executes(EverFestCommands::setDate)))
+                .then(Commands.literal("add").requires(s -> s.hasPermission(ADMIN_LEVEL))
+                        .then(Commands.argument("days", IntegerArgumentType.integer(-100000, 100000)).executes(EverFestCommands::addDays)))
+                .then(Commands.literal("clearoverride").requires(s -> s.hasPermission(ADMIN_LEVEL))
+                        .executes(EverFestCommands::clearOverride)));
+        HolidayCommands.attach(root);
+        dispatcher.register(root);
+    }
+
+    static CalendarService calendar() {
+        return EverFestServer.require().calendar();
+    }
+
+    static Component describe(CalendarSnapshot s) {
+        boolean real = s.mode() == CalendarMode.REAL_WORLD;
+        return Component.literal(s.date().toDisplayString(real))
+                .append(Component.literal(String.format(Locale.ROOT, " %02d:%02d, ", s.hour(), s.minute())))
+                .append(Component.translatable("holidayseasons.subseason." + s.subSeason().id()));
+    }
+
+    private static int openCalendar(CommandContext<CommandSourceStack> ctx) {
+        ServerPlayer player = ctx.getSource().getPlayer();
+        if (player == null) {
+            ctx.getSource().sendFailure(Component.literal("Only players can open the calendar"));
+            return 0;
+        }
+        calendar().sendTo(player);
+        PacketDistributor.sendToPlayer(player, new OpenScreenPayload(OpenScreenPayload.Screen.CALENDAR));
+        return 1;
+    }
+
+    private static int showDate(CommandContext<CommandSourceStack> ctx) {
+        CalendarSnapshot s = calendar().snapshot();
+        ctx.getSource().sendSuccess(() -> Component.translatable("holidayseasons.command.date", describe(s)), false);
+        return 1;
+    }
+
+    private static int showInfo(CommandContext<CommandSourceStack> ctx) {
+        CalendarService cal = calendar();
+        CalendarSnapshot s = cal.snapshot();
+        CommandSourceStack src = ctx.getSource();
+        src.sendSuccess(() -> Component.translatable("holidayseasons.command.date", describe(s)), false);
+        src.sendSuccess(() -> Component.literal("Mode: " + s.mode() + "  system: " + s.systemSignature()
+                + "  year length: " + cal.activeSystem().yearLength(s.date().year()) + " days"), false);
+        src.sendSuccess(() -> Component.literal("Season source: " + (s.seasonsFromSereneSeasons() ? "Serene Seasons" : "calendar")
+                + "  season adapter: " + cal.seasonAdapter().name()
+                + "  policy: " + cal.settings().seasonSyncPolicy()), false);
+        cal.seasonReading().ifPresent(r -> src.sendSuccess(() -> Component.literal("Serene Seasons: " + r.subSeason().id()
+                + ", " + r.daysPerSubSeason() + " days per sub-season, cycle tick " + r.cycleTicks()
+                + (r.cycling() ? "" : " (season cycle paused)")), false));
+        if (s.mode() == CalendarMode.REAL_WORLD) {
+            String override = cal.data().realDateOverride();
+            src.sendSuccess(() -> Component.literal("Timezone: " + cal.settings().realWorldZone()
+                    + (override != null ? "  override: " + override : "")
+                    + (cal.data().realDayOffset() != 0 ? "  offset: " + cal.data().realDayOffset() + " days" : "")), false);
+        }
+        CalendarSnapshot sched = cal.schedulingSnapshot();
+        if (sched != s) {
+            src.sendSuccess(() -> Component.literal("Holidays are scheduled on the season calendar: " + sched.date()), false);
+        }
+        return 1;
+    }
+
+    private static int setDate(CommandContext<CommandSourceStack> ctx) {
+        String raw = StringArgumentType.getString(ctx, "date");
+        CalendarDate target;
+        try {
+            target = CalendarDate.parseIso(raw);
+        } catch (RuntimeException e) {
+            ctx.getSource().sendFailure(Component.translatable("holidayseasons.command.bad_date", raw));
+            return 0;
+        }
+        String error = calendar().setDate(target);
+        if (error != null) {
+            ctx.getSource().sendFailure(Component.literal(error));
+            return 0;
+        }
+        ctx.getSource().sendSuccess(() -> Component.translatable("holidayseasons.command.date_set", target.toIsoString()), true);
+        return 1;
+    }
+
+    private static int addDays(CommandContext<CommandSourceStack> ctx) {
+        int days = IntegerArgumentType.getInteger(ctx, "days");
+        String result = calendar().addDays(days);
+        ctx.getSource().sendSuccess(() -> Component.literal(result), true);
+        return 1;
+    }
+
+    private static int clearOverride(CommandContext<CommandSourceStack> ctx) {
+        calendar().clearRealWorldOverride();
+        ctx.getSource().sendSuccess(() -> Component.translatable("holidayseasons.command.override_cleared"), true);
+        return 1;
+    }
+}
