@@ -59,6 +59,23 @@ public final class EverFestBlocks {
                     .noOcclusion().noCollission().pushReaction(PushReaction.DESTROY), Block.box(4, 2, 4, 12, 16, 12), true,
                     ParticleTypes.WHITE_ASH));
 
+    public static final DeferredBlock<PresentBlock> PRESENT = BLOCKS.register("present",
+            () -> new PresentBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(0.5f).sound(SoundType.WOOL)
+                    .noOcclusion().pushReaction(PushReaction.DESTROY), 10));
+
+    public static final DeferredBlock<ChristmasTreeBlock> CHRISTMAS_TREE = BLOCKS.register("christmas_tree",
+            () -> new ChristmasTreeBlock(BlockBehaviour.Properties.of().mapColor(MapColor.PLANT).strength(0.8f).sound(SoundType.AZALEA_LEAVES)
+                    .noOcclusion().pushReaction(PushReaction.DESTROY)
+                    .lightLevel(s -> s.getValue(ChristmasTreeBlock.LIT) ? 12 : 0)));
+
+    public static final DeferredBlock<WallDecorBlock> WREATH = BLOCKS.register("wreath",
+            () -> new WallDecorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.PLANT).strength(0.3f).sound(SoundType.AZALEA_LEAVES)
+                    .noCollission().noOcclusion().pushReaction(PushReaction.DESTROY)));
+
+    public static final DeferredBlock<WallDecorBlock> STRING_LIGHTS = BLOCKS.register("string_lights",
+            () -> new WallDecorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_YELLOW).strength(0.2f).sound(SoundType.LANTERN)
+                    .noCollission().noOcclusion().lightLevel(s -> 10).pushReaction(PushReaction.DESTROY)));
+
     private EverFestBlocks() {
     }
 

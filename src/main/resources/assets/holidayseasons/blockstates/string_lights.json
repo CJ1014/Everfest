@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "holidayseasons:block/string_lights"
+    },
+    "facing=east": {
+      "model": "holidayseasons:block/string_lights",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "holidayseasons:block/string_lights",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "holidayseasons:block/string_lights",
+      "y": 270
+    }
+  }
+}

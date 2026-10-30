@@ -57,6 +57,12 @@ public final class ReputationData extends SavedData {
         return updated;
     }
 
+    /** Operator override. */
+    public void set(UUID player, String village, int value) {
+        points.computeIfAbsent(player, k -> new HashMap<>()).put(village, Math.max(ReputationMath.MIN, Math.min(ReputationMath.MAX, value)));
+        setDirty();
+    }
+
     public Map<String, Integer> of(UUID player) {
         return Map.copyOf(points.getOrDefault(player, Map.of()));
     }

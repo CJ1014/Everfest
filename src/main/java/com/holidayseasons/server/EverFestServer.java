@@ -30,6 +30,7 @@ public final class EverFestServer {
     private final HomeRegistry homes;
     private final ReputationData reputation;
     private final com.holidayseasons.event.HalloweenService halloween;
+    private final com.holidayseasons.event.GiftService gifts;
 
     private EverFestServer(MinecraftServer server) {
         this.server = server;
@@ -39,6 +40,11 @@ public final class EverFestServer {
         this.reputation = server.overworld().getDataStorage().computeIfAbsent(ReputationData.FACTORY, ReputationData.FILE_ID);
         this.director = new CelebrationDirector(server, calendar, holidays);
         this.halloween = new com.holidayseasons.event.HalloweenService(server, this);
+        this.gifts = new com.holidayseasons.event.GiftService(server, this);
+    }
+
+    public com.holidayseasons.event.GiftService gifts() {
+        return gifts;
     }
 
     public HomeRegistry homes() {
@@ -117,5 +123,6 @@ public final class EverFestServer {
         holidays.tick();
         director.tick();
         halloween.tick();
+        gifts.tick();
     }
 }

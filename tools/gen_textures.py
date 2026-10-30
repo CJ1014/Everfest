@@ -727,6 +727,206 @@ def scarecrow_entity():
 
 
 
+
+# ----------------------------------------------------------------------------------------------- christmas
+
+NEEDLE = hexc("2f6b3a")
+NEEDLE_D = hexc("1e4a28")
+NEEDLE_L = hexc("4a8f4f")
+RED = hexc("c0392b")
+GOLD = hexc("d4af37")
+SNOW = hexc("f4f8ff")
+
+
+@texture("block/present_paper.png")
+def present_paper():
+    # Greyscale so the wrapping colour (tint) shows through; subtle star pattern.
+    img = canvas()
+    noise_fill(img, (0, 0, 16, 16), hexc("e8e8e8"), 0.03, 90)
+    for x, y in ((3, 3), (11, 5), (6, 10), (13, 12), (2, 13)):
+        img.putpixel((x, y), hexc("ffffff"))
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            img.putpixel((x + dx, y + dy), hexc("f8f8f8"))
+    return img
+
+
+@texture("block/present_ribbon.png")
+def present_ribbon():
+    img = canvas()
+    noise_fill(img, (0, 0, 16, 16), GOLD, 0.06, 91)
+    for y in range(0, 16, 3):
+        img.putpixel((7, y), hexc("f0d070"))
+    return img
+
+
+@texture("block/present_open.png")
+def present_open():
+    img = canvas()
+    noise_fill(img, (0, 0, 16, 16), hexc("b88a58"), 0.06, 92)
+    rect(img, 0, 0, 16, 1, hexc("8a6038"))
+    rect(img, 0, 15, 16, 16, hexc("8a6038"))
+    return img
+
+
+@texture("block/tree_needles.png")
+def tree_needles():
+    img = canvas()
+    noise_fill(img, (0, 0, 16, 16), NEEDLE, 0.12, 93)
+    dots(img, (0, 0, 16, 16), [NEEDLE_D, NEEDLE_L, hexc("26593a")], 70, 94)
+    return img
+
+
+def ornaments(level, seed):
+    img = canvas()
+    colors = [RED, GOLD, hexc("2e6ec0"), hexc("e84a7f"), hexc("e8e8e8"), hexc("8e44ad")]
+    rnd = random.Random(seed)
+    spots = [(2, 3), (11, 2), (6, 7), (13, 9), (3, 12), (9, 13), (7, 1), (1, 8), (14, 14)]
+    for i, (x, y) in enumerate(spots[: level * 3]):
+        c = colors[rnd.randrange(len(colors))]
+        rect(img, x, y, x + 2, y + 2, c)
+        img.putpixel((x, y), shade(c, 1.35))
+    if level >= 2:
+        for x in range(16):
+            y = 5 + int(2 * __import__("math").sin(x / 2.0))
+            if img.getpixel((x, y))[3] == 0:
+                img.putpixel((x, y), hexc("e8e0c8"))
+    return img
+
+
+for _lvl in (1, 2, 3):
+    TEXTURES[f"block/tree_ornaments_{_lvl}.png"] = (lambda l: (lambda: ornaments(l, 95 + l)))(_lvl)
+
+
+@texture("block/tree_star.png")
+def tree_star():
+    img = canvas()
+    noise_fill(img, (0, 0, 16, 16), GOLD, 0.08, 96)
+    return img
+
+
+@texture("block/tree_star_lit.png")
+def tree_star_lit():
+    img = canvas()
+    noise_fill(img, (0, 0, 16, 16), hexc("fff2a8"), 0.04, 97)
+    return img
+
+
+@texture("block/tree_lights.png")
+def tree_lights():
+    img = canvas()
+    rnd = random.Random(98)
+    for i in range(18):
+        x, y = rnd.randrange(16), rnd.randrange(16)
+        img.putpixel((x, y), rnd.choice([hexc("ffe680"), hexc("ff8080"), hexc("80c0ff"), hexc("a0ff a0".replace(" ", ""))]))
+    return img
+
+
+@texture("block/wreath.png")
+def wreath():
+    img = canvas()
+    import math
+    for y in range(16):
+        for x in range(16):
+            d = math.hypot(x - 7.5, y - 7.5)
+            if 3.5 <= d <= 7.2:
+                img.putpixel((x, y), NEEDLE_L if (x * 3 + y) % 5 == 0 else (NEEDLE_D if (x + y) % 3 == 0 else NEEDLE))
+    for x, y in ((3, 4), (12, 6), (5, 12), (11, 11), (2, 9), (13, 2)):
+        img.putpixel((x, y), RED)
+    rect(img, 6, 12, 10, 15, RED)
+    img.putpixel((5, 15), RED)
+    img.putpixel((10, 15), RED)
+    rect(img, 7, 13, 9, 14, hexc("e85848"))
+    return img
+
+
+@texture("block/string_lights.png")
+def string_lights():
+    img = canvas()
+    import math
+    colors = [hexc("ff5050"), hexc("ffd84a"), hexc("50c0ff"), hexc("60e070"), hexc("ff80e0")]
+    for x in range(16):
+        y = 3 + int(round(2 * math.sin(x / 2.5)))
+        img.putpixel((x, y), hexc("2a3a2a"))
+        if x % 3 == 1:
+            c = colors[(x // 3) % len(colors)]
+            rect(img, x, y + 1, x + 2, y + 3, c)
+    for x in range(16):
+        y = 10 + int(round(2 * math.sin(x / 2.5 + 1.5)))
+        img.putpixel((x, y), hexc("2a3a2a"))
+        if x % 3 == 0:
+            c = colors[(x // 3 + 2) % len(colors)]
+            rect(img, x, y + 1, x + 2, y + 3, c)
+    return img
+
+
+@texture("item/christmas_tree.png")
+def christmas_tree_item():
+    rows = [
+        ".......Y........",
+        "......YYY.......",
+        ".......G........",
+        "......GGG.......",
+        ".....GGRGG......",
+        "......GGG.......",
+        ".....GGGGG......",
+        "....GBGGGGG.....",
+        "...GGGGGYGGG....",
+        ".....GGGGG......",
+        "....GGGGRGGG....",
+        "...GGYGGGGBGG...",
+        "..GGGGGGGGGGGG..",
+        ".......TT.......",
+        ".......TT.......",
+        "................",
+    ]
+    return from_map(rows, {"Y": GOLD, "G": NEEDLE, "R": RED, "B": hexc("2e6ec0"), "T": BROWN})
+
+
+@texture("item/ornament.png")
+def ornament_item():
+    rows = [
+        "................",
+        "................",
+        ".......GG.......",
+        "......G..G......",
+        ".......GG.......",
+        ".....RRRRRR.....",
+        "....RWRRRRRR....",
+        "...RWRRRRRRRR...",
+        "...RRRRRRRRRR...",
+        "...RRRRRRRRRr...",
+        "...RRRRRRRRrr...",
+        "....RRRRRRrr....",
+        ".....rrrrrr.....",
+        "................",
+        "................",
+        "................",
+    ]
+    return from_map(rows, {"G": GOLD, "R": RED, "r": hexc("8e231d"), "W": hexc("f0a090")})
+
+
+TEXTURES["item/costume/santa_red.png"] = flat(RED, 99, 0.06)
+TEXTURES["item/costume/fur.png"] = flat(SNOW, 100, 0.04)
+TEXTURES["item/costume/elf_green.png"] = flat(hexc("2e8b57"), 101, 0.06)
+TEXTURES["item/costume/elf_trim.png"] = flat(hexc("c0392b"), 102, 0.06)
+TEXTURES["item/costume/bell.png"] = flat(GOLD, 103, 0.05)
+TEXTURES["item/costume/antler.png"] = flat(hexc("8a6a42"), 104, 0.08)
+TEXTURES["item/costume/headband.png"] = flat(hexc("6b3a1e"), 105, 0.06)
+
+
+@texture("item/costume/beanie.png")
+def beanie():
+    img = canvas()
+    for y in range(16):
+        c = hexc("2e6ec0") if (y // 3) % 2 == 0 else SNOW
+        rect(img, 0, y, 16, y + 1, c)
+    for x in range(0, 16, 2):
+        for y in range(16):
+            px = img.getpixel((x, y))
+            img.putpixel((x, y), shade(px, 0.9))
+    return img
+
+
 def main():
     only = set(sys.argv[1:])
     for path, fn in TEXTURES.items():

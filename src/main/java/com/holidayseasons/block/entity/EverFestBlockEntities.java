@@ -18,6 +18,9 @@ public final class EverFestBlockEntities {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HearthBlockEntity>> HEARTH = TYPES.register("holiday_hearth",
             () -> BlockEntityType.Builder.of(HearthBlockEntity::new, EverFestBlocks.HOLIDAY_HEARTH.get()).build(null));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PresentBlockEntity>> PRESENT = TYPES.register("present",
+            () -> BlockEntityType.Builder.of(PresentBlockEntity::new, EverFestBlocks.PRESENT.get()).build(null));
+
     private EverFestBlockEntities() {
     }
 

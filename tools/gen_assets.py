@@ -341,6 +341,157 @@ def lang(sound_names):
         f.write("\n")
 
 
+# ----------------------------------------------------------------------------------------------- christmas
+
+def tinted(frm, to, tex, tint=0, faces=("north", "south", "east", "west", "up", "down")):
+    return {"from": frm, "to": to, "faces": {f: {"uv": [0, 0, 16, 16], "texture": tex, "tintindex": tint} for f in faces}}
+
+
+def christmas():
+    # Present: wrapped (tinted paper + ribbons + bow) and open box.
+    wrapped = [tinted([3, 0, 3], [13, 9, 13], "#paper"),
+               cube([7.25, 0, 2.9], [8.75, 9.1, 13.1], "#ribbon", faces=("north", "south", "up")),
+               cube([2.9, 0, 7.25], [13.1, 9.1, 8.75], "#ribbon", faces=("east", "west", "up")),
+               cube([6, 9, 7], [8, 11, 9], "#ribbon"), cube([8, 9, 7], [10, 11, 9], "#ribbon")]
+    write(f"{A}/models/block/present_wrapped.json", {"parent": "minecraft:block/block", "ambientocclusion": False,
+          "textures": {"paper": t("block/present_paper"), "ribbon": t("block/present_ribbon"), "particle": t("block/present_paper")},
+          "elements": wrapped})
+    write(f"{A}/models/block/present_open.json", {"parent": "minecraft:block/block", "ambientocclusion": False,
+          "textures": {"box": t("block/present_open"), "particle": t("block/present_open")},
+          "elements": [cube([3, 0, 3], [13, 1, 13], "#box"), cube([3, 1, 3], [13, 8, 4], "#box"), cube([3, 1, 12], [13, 8, 13], "#box"),
+                       cube([3, 1, 4], [4, 8, 12], "#box"), cube([12, 1, 4], [13, 8, 12], "#box")]})
+    write(f"{A}/blockstates/present.json", {"variants": {"wrapped=true": {"model": t("block/present_wrapped")},
+                                                         "wrapped=false": {"model": t("block/present_open")}}})
+    write(f"{A}/models/item/present.json", {"parent": t("block/present_wrapped")})
+
+    # Christmas tree halves.
+    variants = {}
+    for deco in range(4):
+        for lit in (False, True):
+            ltex = {"needles": t("block/tree_needles"), "log": "minecraft:block/spruce_log", "particle": t("block/tree_needles")}
+            lower = [cube([6.5, 0, 6.5], [9.5, 3, 9.5], "#log"), cube([1, 3, 1], [15, 9, 15], "#needles"), cube([2.5, 9, 2.5], [13.5, 16, 13.5], "#needles")]
+            upper = [cube([4, 0, 4], [12, 7, 12], "#needles"), cube([5.5, 7, 5.5], [10.5, 12, 10.5], "#needles"),
+                     cube([7, 12, 7], [9, 15, 9], "#star", rotation={"angle": 45, "axis": "y", "origin": [8, 13, 8]})]
+            if deco > 0:
+                ltex["orn"] = t(f"block/tree_ornaments_{deco}")
+                lower += [cube([0.9, 3, 0.9], [15.1, 9, 15.1], "#orn", faces=("north", "south", "east", "west")),
+                          cube([2.4, 9, 2.4], [13.6, 16, 13.6], "#orn", faces=("north", "south", "east", "west"))]
+                upper += [cube([3.9, 0, 3.9], [12.1, 7, 12.1], "#orn", faces=("north", "south", "east", "west"))]
+            if lit:
+                ltex["lights"] = t("block/tree_lights")
+                lower += [cube([0.8, 3, 0.8], [15.2, 9, 15.2], "#lights", faces=("north", "south", "east", "west"))]
+                upper += [cube([5.4, 7, 5.4], [10.6, 12, 10.6], "#lights", faces=("north", "south", "east", "west"))]
+            utex = dict(ltex)
+            utex["star"] = t("block/tree_star_lit" if lit else "block/tree_star")
+            suffix = f"{deco}{'_lit' if lit else ''}"
+            write(f"{A}/models/block/christmas_tree_lower_{suffix}.json", {"parent": "minecraft:block/block", "textures": ltex, "elements": lower})
+            write(f"{A}/models/block/christmas_tree_upper_{suffix}.json", {"parent": "minecraft:block/block", "textures": utex, "elements": upper})
+            for half in ("lower", "upper"):
+                variants[f"decoration={deco},half={half},lit={str(lit).lower()}"] = {"model": t(f"block/christmas_tree_{half}_{suffix}")}
+    write(f"{A}/blockstates/christmas_tree.json", {"variants": variants})
+    write(f"{A}/models/item/christmas_tree.json", {"parent": "minecraft:item/generated", "textures": {"layer0": t("item/christmas_tree")}})
+
+    for name in ("wreath", "string_lights"):
+        write(f"{A}/models/block/{name}.json", {"parent": "minecraft:block/block", "ambientocclusion": False,
+              "textures": {"tex": t("block/" + name), "particle": t("block/" + name)},
+              "elements": [{"from": [0, 0, 15.5], "to": [16, 16, 15.6], "faces": {
+                  "north": {"uv": [0, 0, 16, 16], "texture": "#tex"}, "south": {"uv": [16, 0, 0, 16], "texture": "#tex"}}}]})
+        write(f"{A}/blockstates/{name}.json", facing_variants(t("block/" + name)))
+        write(f"{A}/models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": t("block/" + name)}})
+    simple_item("ornament")
+
+    # Festive hats (3D, head-centred like the costumes).
+    gui = {"rotation": [30, 225, 0], "translation": [0, -1.5, 0], "scale": [0.5, 0.5, 0.5]}
+    common = {"parent": "minecraft:block/block", "display": {"gui": gui, "fixed": {"rotation": [0, 180, 0], "scale": [0.5, 0.5, 0.5]}}}
+    C = lambda n: t("item/costume/" + n)
+    hats = {
+        "santa_hat": {"textures": {"red": C("santa_red"), "fur": C("fur"), "particle": C("santa_red")},
+                      "elements": [cube([0, 14, 0], [16, 16.5, 16], "#fur"), cube([1.5, 16.5, 1.5], [14.5, 20, 14.5], "#red"),
+                                   cube([3.5, 20, 3.5], [12.5, 23, 12.5], "#red", rotation={"angle": -22.5, "axis": "x", "origin": [8, 20, 8]}),
+                                   cube([5.5, 22, 9], [10.5, 25, 14], "#red", rotation={"angle": -45, "axis": "x", "origin": [8, 22, 11]}),
+                                   cube([6, 21, 14], [10, 25, 18], "#fur")]},
+        "elf_hat": {"textures": {"green": C("elf_green"), "trim": C("elf_trim"), "bell": C("bell"), "particle": C("elf_green")},
+                    "elements": [cube([0, 14, 0], [16, 16, 16], "#trim"), cube([2, 16, 2], [14, 20, 14], "#green"),
+                                 cube([4, 20, 4], [12, 24, 12], "#green", rotation={"angle": 22.5, "axis": "z", "origin": [8, 20, 8]}),
+                                 cube([6, 23, 6], [10, 27, 10], "#green", rotation={"angle": 45, "axis": "z", "origin": [8, 24, 8]}),
+                                 cube([13, 23, 7], [16, 26, 10], "#bell")]},
+        "antlers": {"textures": {"antler": C("antler"), "band": C("headband"), "particle": C("antler")},
+                    "elements": [cube([1, 14.5, 7], [15, 15.5, 9], "#band"),
+                                 cube([2, 15.5, 7.5], [3.5, 22, 8.5], "#antler"), cube([-1.5, 19, 7.5], [2, 20.5, 8.5], "#antler"),
+                                 cube([3.5, 20, 7.5], [5.5, 21.5, 8.5], "#antler"),
+                                 cube([12.5, 15.5, 7.5], [14, 22, 8.5], "#antler"), cube([14, 19, 7.5], [17.5, 20.5, 8.5], "#antler"),
+                                 cube([10.5, 20, 7.5], [12.5, 21.5, 8.5], "#antler")]},
+        "winter_beanie": {"textures": {"knit": C("beanie"), "fur": C("fur"), "particle": C("beanie")},
+                          "elements": [cube([0.3, 11, 0.3], [15.7, 16.5, 15.7], "#knit"), cube([2, 16.5, 2], [14, 18, 14], "#knit"),
+                                       cube([6, 18, 6], [10, 21, 10], "#fur")]},
+    }
+    for name, m in hats.items():
+        model = dict(common)
+        model.update(m)
+        write(f"{A}/models/item/{name}.json", model)
+
+    # Loot: presents keep contents and wrapping like shulker boxes; the tree drops from its lower half only.
+    write(f"{D}/loot_table/blocks/present.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{
+        "type": "minecraft:item", "name": t("present"), "functions": [{"function": "minecraft:copy_components", "source": "block_entity",
+                                                                       "include": ["minecraft:container", t("present")]}]}],
+        "conditions": [{"condition": "minecraft:survives_explosion"}]}], "random_sequence": t("blocks/present")})
+    write(f"{D}/loot_table/blocks/christmas_tree.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
+        "entries": [{"type": "minecraft:item", "name": t("christmas_tree")}],
+        "conditions": [{"condition": "minecraft:block_state_property", "block": t("christmas_tree"), "properties": {"half": "lower"}},
+                       {"condition": "minecraft:survives_explosion"}]}], "random_sequence": t("blocks/christmas_tree")})
+    for n in ("wreath", "string_lights"):
+        write(f"{D}/loot_table/blocks/{n}.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
+              "entries": [{"type": "minecraft:item", "name": t(n)}], "conditions": [{"condition": "minecraft:survives_explosion"}]}],
+              "random_sequence": t("blocks/" + n)})
+
+    shaped("present", ["PSP", "P P", "PPP"], {"P": "minecraft:paper", "S": "minecraft:string"})
+    shapeless("ornament", ["minecraft:glass_pane", "minecraft:red_dye", "minecraft:gold_nugget"], 4)
+    shaped("christmas_tree", [" S ", "LLL", " W "], {"S": "minecraft:gold_nugget", "L": "minecraft:spruce_leaves", "W": "minecraft:spruce_log"})
+    shaped("wreath", ["LLL", "L L", "LRL"], {"L": "minecraft:spruce_leaves", "R": "minecraft:red_dye"})
+    shapeless("string_lights", ["minecraft:string", "minecraft:glowstone_dust", "minecraft:red_dye", "minecraft:blue_dye"], 3)
+    shapeless("santa_hat", ["minecraft:red_wool", "minecraft:red_wool", "minecraft:white_wool"])
+    shapeless("elf_hat", ["minecraft:green_wool", "minecraft:green_wool", "minecraft:red_wool", "minecraft:gold_nugget"])
+    shapeless("antlers", ["minecraft:stick", "minecraft:stick", "minecraft:brown_wool", "minecraft:leather"])
+    shapeless("winter_beanie", ["minecraft:blue_wool", "minecraft:white_wool", "minecraft:string"])
+
+    p = f"{A}/lang/en_us.json"
+    with open(p) as f:
+        lang = json.load(f)
+    lang.update({
+        f"block.{NS}.present": "Present", f"item.{NS}.present": "Present",
+        f"block.{NS}.christmas_tree": "Christmas Tree", f"block.{NS}.wreath": "Wreath", f"block.{NS}.string_lights": "String Lights",
+        f"item.{NS}.ornament": "Ornament", f"item.{NS}.santa_hat": "Santa Hat", f"item.{NS}.elf_hat": "Elf Hat",
+        f"item.{NS}.antlers": "Reindeer Antlers", f"item.{NS}.winter_beanie": "Winter Beanie",
+        f"container.{NS}.present": "Present",
+        f"{NS}.present.not_yours": "Someone else is wrapping this present",
+        f"{NS}.present.empty": "Put something in the present first",
+        f"{NS}.present.cannot_wrap": "This present can't be wrapped",
+        f"{NS}.present.wrapped": "Wrapped! Break it to pick it up, or leave it for its recipient",
+        f"{NS}.present.anyone": "Anyone",
+        f"{NS}.present.tag": "To: %s - From: %s",
+        f"{NS}.present.unwrapped_hint": "Place it, fill it, then sneak + right-click to wrap",
+        f"{NS}.screen.wrap": "Wrap a Present", f"{NS}.screen.wrap.to": "To (player name, empty = anyone)",
+        f"{NS}.screen.wrap.to_hint": "anyone", f"{NS}.screen.wrap.message": "Message", f"{NS}.screen.wrap.paper": "Wrapping paper",
+        f"{NS}.screen.wrap.button": "Wrap it!",
+        f"{NS}.gift.wishes": "%s wishes for: %s",
+        f"{NS}.gift.wrap_first": "Wrap something nice in a present first",
+        f"{NS}.gift.reaction.0": "%s thanks you for the thoughtful present",
+        f"{NS}.gift.reaction.1": "%s loves it - just their kind of thing!",
+        f"{NS}.gift.reaction.2": "%s is overjoyed - it was on their wish list!",
+        f"{NS}.gift.from_villager": "%s has a present for you!",
+        f"{NS}.gift.mysterious": "Jingling bells in the night... someone left a present by your hearth.",
+        f"{NS}.screen.preparing_in": "Preparing (%s d)",
+        f"{NS}.screen.in_days": "In %s days",
+        f"{NS}.reputation.no_village": "There is no village EverFest knows within 96 blocks",
+        f"{NS}.reputation.show": "Your holiday reputation here: %s (%s)",
+        f"{NS}.reputation.tier.stranger": "Stranger", f"{NS}.reputation.tier.neighbour": "Neighbour",
+        f"{NS}.reputation.tier.friend": "Friend", f"{NS}.reputation.tier.cherished": "Cherished", f"{NS}.reputation.tier.legend": "Legend",
+    })
+    with open(p, "w") as f:
+        json.dump(lang, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+
+
 if __name__ == "__main__":
     items()
     blocks()
@@ -348,4 +499,5 @@ if __name__ == "__main__":
     recipes()
     tags()
     lang(sounds())
+    christmas()
     print("assets generated")

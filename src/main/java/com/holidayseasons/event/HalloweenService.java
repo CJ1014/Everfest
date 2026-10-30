@@ -363,20 +363,37 @@ public final class HalloweenService {
     /** Puts on or takes off a villager's temporary costume depending on whether it's Halloween costume time. */
     public void updateCostume(Villager v, @Nullable CelebrationDirector.Festival f, long today) {
         ItemStack head = v.getItemBySlot(EquipmentSlot.HEAD);
-        boolean costumeTime = f != null && f.holiday().id().equals(HOLIDAY_ID) && f.has("wear_costumes")
-                && cfg(() -> ServerConfig.INSTANCE.villagerCostumes.get(), true)
+        boolean dressTime = f != null && cfg(() -> ServerConfig.INSTANCE.villagerCostumes.get(), true)
                 && (f.phase() == HolidayPhase.ACTIVE || (f.phase() == HolidayPhase.PREPARING && today >= f.occurrence().window().start() - 1));
-        if (!costumeTime) {
+        boolean halloween = dressTime && f.holiday().id().equals(HOLIDAY_ID) && f.has("wear_costumes");
+        boolean christmas = dressTime && f.holiday().id().equals(GiftService.HOLIDAY_ID);
+        if (!halloween && !christmas) {
             if (!head.isEmpty() && CostumeItem.isTemporary(head)) v.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
             return;
         }
-        if (!head.isEmpty()) return;
+        String occ = f.occurrence().key();
+        if (!head.isEmpty()) {
+            // Swap last holiday's temporary outfit for this one; never touch anything else.
+            if (!CostumeItem.isTemporary(head) || occ.equals(head.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA)
+                    .copyTag().getString(CostumeItem.TEMPORARY_KEY))) return;
+        }
         String profession = BuiltInRegistries.VILLAGER_PROFESSION.getKey(v.getVillagerData().getProfession()).getPath();
         VillagerPersonality p = VillagerPersonality.of(v.getUUID(), profession, v.isBaby());
         if (!v.isBaby() && p.enthusiasm() < 0.55f) return;
-        ItemStack costume = CostumeItem.temporary(new ItemStack(EverFestItems.COSTUMES.get(p.costume()).get()), f.occurrence().key());
+        Item wear = halloween ? EverFestItems.COSTUMES.get(p.costume()).get() : festiveHat(v, p);
+        ItemStack costume = CostumeItem.temporary(new ItemStack(wear), occ);
         v.setItemSlot(EquipmentSlot.HEAD, costume);
         v.setDropChance(EquipmentSlot.HEAD, 0f);
+    }
+
+    private static Item festiveHat(Villager v, VillagerPersonality p) {
+        if (v.isBaby()) return p.costume().ordinal() % 2 == 0 ? EverFestItems.ELF_HAT.get() : EverFestItems.ANTLERS.get();
+        return switch (p.giftPreference()) {
+            case GEMS, BOOKS -> EverFestItems.SANTA_HAT.get();
+            case CLOTHES, FLOWERS -> EverFestItems.WINTER_BEANIE.get();
+            case TREATS -> EverFestItems.ELF_HAT.get();
+            default -> p.generosity() > 0.6f ? EverFestItems.SANTA_HAT.get() : EverFestItems.WINTER_BEANIE.get();
+        };
     }
 
     // ------------------------------------------------------------------ creatures

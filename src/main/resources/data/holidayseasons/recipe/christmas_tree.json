@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " S ",
+    "LLL",
+    " W "
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:gold_nugget"
+    },
+    "L": {
+      "item": "minecraft:spruce_leaves"
+    },
+    "W": {
+      "item": "minecraft:spruce_log"
+    }
+  },
+  "result": {
+    "id": "holidayseasons:christmas_tree",
+    "count": 1
+  }
+}

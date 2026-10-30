@@ -309,4 +309,54 @@ uses Modrinth version ids, which pin the NeoForge files.
 * Natural creature spawning is intentionally rare (default 8%/s/player attempt, cap 4); tune in `[halloween]`.
 * The candy bag's bundle filtering is not covered by an automated test yet.
 
-## Current milestone: 5 — Christmas
+## Milestone 5 — Christmas ✅ (acceptance verified, one screen not visually verified — see limitations)
+
+### Completed systems
+* **Presents** (block + item, `holidayseasons:present` data component): place an empty box, fill its 9 slots (only the
+  placer may open it while unwrapped), sneak + right-click to wrap — recipient (empty = anyone), message, one of 8
+  paper colours (tinted on block and item). Wrapped: the recipient opens it with a right-click (contents go to the
+  player, the block is removed first — no duplication window); everyone else sees "To / From". Breaking keeps
+  contents and wrapping in the item (loot `copy_components`, creative-break handled like shulker boxes); unwrapping
+  in hand consumes the present before handing out its contents; presents cannot be nested; stack size 1.
+* **Wish lists & preferences**: deterministic per villager and year from its personality's gift preference (7
+  categories); sneak + right-click a villager with an empty hand during the Christmas season to hear its wishes.
+* **Giving presents to villagers**: a wrapped, non-empty present is accepted; reaction and reputation scale with how
+  much it is liked (wish list 2, preferred kind 1, otherwise 0); one reward per player per villager per Christmas
+  (persistent claims, survives restarts).
+* **Villagers give presents** to nearby players whose village reputation is at least Neighbour: walk over carrying a
+  present and hand it over as an item only that player can pick up; contents scale with reputation tier (cookies →
+  emeralds → profession gifts → ornaments → diamonds and a Santa hat); once per villager per player per Christmas.
+* **Villager↔villager gift exchanges**: walk to a friend with a present, the friend unwraps it with particles/sounds.
+* **Mysterious gift delivery** (special event, holiday JSON chance): on Christmas night a present appears at each
+  online player's hearth with a chime and sparkles; rolled once per player per Christmas, never repeated.
+* **Decor**: two-block Christmas Tree (3 rounds of ornaments, glowstone dust lights it — light 12, sparkling star),
+  Wreath and String Lights (wall-hung, lights glow), Ornaments.
+* **Festive wear**: Santa Hat, Elf Hat, Reindeer Antlers, Winter Beanie (wearable 3D hats); villagers wear them on the
+  last preparation day and Christmas (children: elf hats/antlers), replacing Halloween's temporary costume, never a
+  player-given hat, removed afterwards.
+* `/everfest reputation` shows your standing in the nearest village; operators `/everfest reputation set <player> <n>`.
+
+### Test results
+* **Unit tests — 67/67** (new: wish lists deterministic, distinct, from the catalogue, vary by year; appreciation).
+* **GameTests — 26/26, two consecutive runs**: recipient-only opening and exact content transfer with nothing extra
+  dropped; breaking keeps contents in one item and in-hand unwrapping gives them exactly once; unwrapped/empty presents
+  refused by villagers, wished-for present delights, reputation rises, no extra reward for repeats; villager gives a
+  liked player exactly one addressed, non-empty present; tree decorates both halves (max 3 ornaments), lights to 12,
+  breaking the lower half removes the upper; children wear elf hats/antlers at Christmas and take them off afterwards.
+* **Live**: Christmas Day in the savanna village — 13 villagers gathering, feasting, socializing and exchanging gifts;
+  4 Santa hats, 2 elf hats, 2 antlers; the decorated tree centrepiece; with the player's reputation at 60, several
+  villagers (incl. the cartographer) autonomously brought the player addressed presents (one already picked up: 5
+  emeralds + gifts), shown red/green-tinted in the hotbar; calendar shows Christmas "happening now" and New Year's
+  preparing.
+
+### Bugs found and fixed during M5 verification
+* The present recipe produced 2 items while presents stack to 1 → Minecraft rejected the recipe (server log).
+* Sidebar text "Preparing - starts in N days" overflowed the calendar panel → shortened.
+* Test-harness lessons: X display liveness must not be checked with a pattern that matches the checking shell.
+
+### Known issues / limitations (M5)
+* The wrap screen's rendering was not screenshot-verified: xdotool mouse clicks did not reach the game for block
+  interaction in the headless client. The server-side wrap/unwrap rules are covered by GameTests.
+* Original Christmas music is part of Milestone 8 (audio). Christmas merchants are part of Milestone 7.
+
+## Current milestone: 6 — Remaining holidays

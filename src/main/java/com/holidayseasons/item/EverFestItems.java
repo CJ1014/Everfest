@@ -72,6 +72,19 @@ public final class EverFestItems {
         }
     }
 
+    // ---- christmas
+    public static final DeferredItem<PresentItem> PRESENT = ITEMS.register("present",
+            () -> new PresentItem(EverFestBlocks.PRESENT.get(), new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> ORNAMENT = ITEMS.registerSimpleItem("ornament", new Item.Properties());
+    public static final DeferredItem<FestiveHatItem> SANTA_HAT = ITEMS.register("santa_hat", () -> new FestiveHatItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<FestiveHatItem> ELF_HAT = ITEMS.register("elf_hat", () -> new FestiveHatItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<FestiveHatItem> ANTLERS = ITEMS.register("antlers", () -> new FestiveHatItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<FestiveHatItem> WINTER_BEANIE = ITEMS.register("winter_beanie", () -> new FestiveHatItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<net.minecraft.world.item.DoubleHighBlockItem> CHRISTMAS_TREE = ITEMS.register("christmas_tree",
+            () -> new net.minecraft.world.item.DoubleHighBlockItem(EverFestBlocks.CHRISTMAS_TREE.get(), new Item.Properties()));
+    public static final DeferredItem<BlockItem> WREATH = ITEMS.registerSimpleBlockItem(EverFestBlocks.WREATH);
+    public static final DeferredItem<BlockItem> STRING_LIGHTS = ITEMS.registerSimpleBlockItem(EverFestBlocks.STRING_LIGHTS);
+
     // ---- spawn eggs
     public static final DeferredItem<DeferredSpawnEggItem> GHOST_SPAWN_EGG = ITEMS.register("ghost_spawn_egg",
             () -> new DeferredSpawnEggItem(EverFestEntities.GHOST, 0xE8F0FF, 0x7A8CB8, new Item.Properties()));

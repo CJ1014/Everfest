@@ -39,6 +39,10 @@ public final class EverFestCommands {
                 .then(Commands.literal("clearoverride").requires(s -> s.hasPermission(ADMIN_LEVEL))
                         .executes(EverFestCommands::clearOverride)));
         root.then(Commands.literal("villages").requires(s -> s.hasPermission(ADMIN_LEVEL)).executes(EverFestCommands::villages));
+        root.then(Commands.literal("reputation").executes(EverFestCommands::showReputation)
+                .then(Commands.literal("set").requires(s -> s.hasPermission(ADMIN_LEVEL))
+                        .then(Commands.argument("player", net.minecraft.commands.arguments.EntityArgument.player())
+                                .then(Commands.argument("points", IntegerArgumentType.integer(-200, 1000)).executes(EverFestCommands::setReputation)))));
         root.then(Commands.literal("halloween").requires(s -> s.hasPermission(ADMIN_LEVEL)).executes(EverFestCommands::halloweenStatus));
         root.then(Commands.literal("home")
                 .then(Commands.literal("list").executes(EverFestCommands::listHomes))
@@ -129,6 +133,50 @@ public final class EverFestCommands {
                     + (occ == null ? "" : ", decorations up " + server.ledger().decorationsFor(k, occ)
                     + " / target " + director.decorationTargetFor(festival))), false);
         });
+        return 1;
+    }
+
+    /** The village nearest to a player (within 96 blocks), as the director knows it. */
+    private static String nearestVillage(ServerPlayer p) {
+        var director = EverFestServer.require().director();
+        String best = null;
+        double bestDist = 96 * 96;
+        for (var rec : director.villages().all()) {
+            if (!rec.key.startsWith(p.level().dimension().location() + "|bell|")) continue;
+            double d = rec.centre().distSqr(p.blockPosition());
+            if (d < bestDist) {
+                best = rec.key;
+                bestDist = d;
+            }
+        }
+        return best;
+    }
+
+    private static int showReputation(CommandContext<CommandSourceStack> ctx) {
+        ServerPlayer p = ctx.getSource().getPlayer();
+        if (p == null) return 0;
+        String village = nearestVillage(p);
+        if (village == null) {
+            ctx.getSource().sendFailure(Component.translatable("holidayseasons.reputation.no_village"));
+            return 0;
+        }
+        int rep = EverFestServer.require().reputation().get(p.getUUID(), village);
+        var tier = com.holidayseasons.reputation.ReputationMath.tier(rep);
+        ctx.getSource().sendSuccess(() -> Component.translatable("holidayseasons.reputation.show", rep,
+                Component.translatable("holidayseasons.reputation.tier." + tier.name().toLowerCase(Locale.ROOT))), false);
+        return rep;
+    }
+
+    private static int setReputation(CommandContext<CommandSourceStack> ctx) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        ServerPlayer p = net.minecraft.commands.arguments.EntityArgument.getPlayer(ctx, "player");
+        int points = IntegerArgumentType.getInteger(ctx, "points");
+        String village = nearestVillage(p);
+        if (village == null) {
+            ctx.getSource().sendFailure(Component.translatable("holidayseasons.reputation.no_village"));
+            return 0;
+        }
+        EverFestServer.require().reputation().set(p.getUUID(), village, points);
+        ctx.getSource().sendSuccess(() -> Component.literal("Reputation of " + p.getGameProfile().getName() + " in " + village + " set to " + points), true);
         return 1;
     }
 

@@ -45,6 +45,7 @@ public final class EverFest {
         com.holidayseasons.block.entity.EverFestBlockEntities.register(modBus);
         com.holidayseasons.entity.EverFestEntities.register(modBus);
         com.holidayseasons.sound.EverFestSounds.register(modBus);
+        com.holidayseasons.item.EverFestDataComponents.register(modBus);
 
         modBus.addListener(EverFestNetwork::register);
         modBus.addListener(this::commonSetup);
@@ -53,6 +54,7 @@ public final class EverFest {
             e.register(com.holidayseasons.gametest.CalendarGameTests.class);
             e.register(com.holidayseasons.gametest.VillageGameTests.class);
             e.register(com.holidayseasons.gametest.HalloweenGameTests.class);
+            e.register(com.holidayseasons.gametest.ChristmasGameTests.class);
         });
 
         NeoForge.EVENT_BUS.addListener(this::onServerStarted);
@@ -127,11 +129,25 @@ public final class EverFest {
         }
     }
 
-    /** Players hand candy to village children by using candy on them. */
+    /** Players hand candy to children, give presents, and hear villagers' Christmas wishes. */
     private void onEntityInteract(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteract event) {
         if (event.getLevel().isClientSide() || !(event.getTarget() instanceof net.minecraft.world.entity.npc.Villager child)) return;
-        if (!child.isBaby() || !event.getItemStack().is(com.holidayseasons.item.EverFestItems.CANDY_TAG)) return;
         EverFestServer s = EverFestServer.get();
+        if (s == null) return;
+        net.minecraft.world.item.ItemStack held = event.getItemStack();
+        if (held.getItem() instanceof com.holidayseasons.item.PresentItem) {
+            if (s.gifts().giveToVillager(event.getEntity(), child, held) >= 0) {
+                event.setCanceled(true);
+                event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+            }
+            return;
+        }
+        if (held.isEmpty() && event.getEntity().isShiftKeyDown() && s.gifts().tellWishes(event.getEntity(), child)) {
+            event.setCanceled(true);
+            event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+            return;
+        }
+        if (!child.isBaby() || !held.is(com.holidayseasons.item.EverFestItems.CANDY_TAG)) return;
         if (s != null && s.halloween().playerGivesCandy(event.getEntity(), child, event.getItemStack())) {
             event.setCanceled(true);
             event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);

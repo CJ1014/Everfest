@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LLL",
+    "L L",
+    "LRL"
+  ],
+  "key": {
+    "L": {
+      "item": "minecraft:spruce_leaves"
+    },
+    "R": {
+      "item": "minecraft:red_dye"
+    }
+  },
+  "result": {
+    "id": "holidayseasons:wreath",
+    "count": 1
+  }
+}

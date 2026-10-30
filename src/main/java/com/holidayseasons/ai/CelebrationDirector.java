@@ -427,6 +427,14 @@ public final class CelebrationDirector {
                 CelebrationTask t = services.halloween().formGroup(v, lv.key, f, children);
                 yield t != null ? t : new GatherTask(occ, lv.key, centre, standingSpot(level, centre, 2, 6), 200 + random.nextInt(200));
             }
+            case GIFT_EXCHANGE -> {
+                var services = com.holidayseasons.server.EverFestServer.get();
+                if (services == null) yield null;
+                net.minecraft.server.level.ServerPlayer player = services.gifts().giftRecipient(v);
+                if (player != null && random.nextBoolean()) yield new GiftExchangeTask(occ, lv.key, player, services.gifts());
+                Villager partner = findPartner(v, lv);
+                yield partner == null ? null : new GiftExchangeTask(occ, lv.key, partner, null);
+            }
             case HAND_OUT_CANDY -> {
                 var services = com.holidayseasons.server.EverFestServer.get();
                 yield services == null ? null : services.halloween().handOutTask(level, v, lv.key, occ, centre);

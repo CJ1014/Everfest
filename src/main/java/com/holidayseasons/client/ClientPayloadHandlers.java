@@ -42,6 +42,10 @@ public final class ClientPayloadHandlers {
         ctx.enqueueWork(() -> Minecraft.getInstance().setScreen(new com.holidayseasons.client.screen.HearthScreen(payload)));
     }
 
+    public static void onOpenWrap(com.holidayseasons.network.OpenWrapPayload payload, IPayloadContext ctx) {
+        ctx.enqueueWork(() -> Minecraft.getInstance().setScreen(new com.holidayseasons.client.screen.WrapPresentScreen(payload.pos(), payload.color())));
+    }
+
     public static void onOpenScreen(OpenScreenPayload payload, IPayloadContext ctx) {
         ctx.enqueueWork(() -> {
             Minecraft mc = Minecraft.getInstance();

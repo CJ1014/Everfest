@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "wrapped=true": {
+      "model": "holidayseasons:block/present_wrapped"
+    },
+    "wrapped=false": {
+      "model": "holidayseasons:block/present_open"
+    }
+  }
+}

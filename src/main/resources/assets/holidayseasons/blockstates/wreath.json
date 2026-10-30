@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "holidayseasons:block/wreath"
+    },
+    "facing=east": {
+      "model": "holidayseasons:block/wreath",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "holidayseasons:block/wreath",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "holidayseasons:block/wreath",
+      "y": 270
+    }
+  }
+}
