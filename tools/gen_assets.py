@@ -492,6 +492,30 @@ def christmas():
         f.write("\n")
 
 
+def spring_and_feasts():
+    eggs = ["easter_egg_pink", "easter_egg_blue", "easter_egg_yellow", "easter_egg_green", "golden_egg"]
+    for n in eggs + ["easter_basket", "chocolate_box", "harvest_pie"]:
+        simple_item(n)
+    write(f"{D}/tags/item/easter_eggs.json", {"values": [t(e) for e in eggs]})
+    shaped("easter_basket", ["S S", "WSW", "WWW"], {"S": "minecraft:stick", "W": "minecraft:wheat"})
+    shapeless("chocolate_box", ["minecraft:cocoa_beans", "minecraft:cocoa_beans", "minecraft:sugar", "minecraft:paper", "minecraft:red_dye"], 2)
+    shapeless("harvest_pie", ["minecraft:pumpkin", "minecraft:apple", "minecraft:wheat", "minecraft:egg", "minecraft:sugar"], 2)
+    p = f"{A}/lang/en_us.json"
+    with open(p) as f:
+        lang = json.load(f)
+    lang.update({
+        f"item.{NS}.easter_egg_pink": "Pink Easter Egg", f"item.{NS}.easter_egg_blue": "Blue Easter Egg",
+        f"item.{NS}.easter_egg_yellow": "Yellow Easter Egg", f"item.{NS}.easter_egg_green": "Green Easter Egg",
+        f"item.{NS}.golden_egg": "Golden Egg", f"item.{NS}.easter_basket": "Easter Basket",
+        f"item.{NS}.chocolate_box": "Box of Chocolates", f"item.{NS}.harvest_pie": "Harvest Pie",
+        f"{NS}.easter.golden": "You found a Golden Egg! What luck!",
+        f"{NS}.new_year.happy": "Happy New Year!",
+    })
+    with open(p, "w") as f:
+        json.dump(lang, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+
+
 if __name__ == "__main__":
     items()
     blocks()
@@ -500,4 +524,5 @@ if __name__ == "__main__":
     tags()
     lang(sounds())
     christmas()
+    spring_and_feasts()
     print("assets generated")

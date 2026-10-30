@@ -201,6 +201,35 @@ public final class DecorationLedger extends SavedData {
         return count;
     }
 
+    /**
+     * Records an already configured entity (e.g. an interaction hitbox) as part of a decoration and adds it to the
+     * world. Returns false if the world refused it.
+     */
+    public boolean placeEntity(ServerLevel level, BlockPos pos, Entity entity, String occurrenceKey, String villageKey, String pieceId) {
+        long id = nextId++;
+        entity.addTag(ENTITY_TAG);
+        CompoundTag data = new CompoundTag();
+        data.putLong("ledger", id);
+        data.putString("occ", occurrenceKey);
+        entity.getPersistentData().put(ENTITY_TAG, data);
+        entries.put(id, new Entry(id, level.dimension(), pos, Kind.DISPLAY, entity.getUUID(), null, occurrenceKey, villageKey, pieceId));
+        if (!level.addFreshEntity(entity)) {
+            entries.remove(id);
+            return false;
+        }
+        setDirty();
+        return true;
+    }
+
+    /** Number of decorations of one piece type for a village and occurrence (e.g. hidden eggs). */
+    public int countPieces(String villageKey, String occurrenceKey, String pieceId) {
+        java.util.Set<Long> positions = new java.util.HashSet<>();
+        for (Entry e : entries.values()) {
+            if (e.villageKey.equals(villageKey) && e.occurrenceKey.equals(occurrenceKey) && e.pieceId.equals(pieceId)) positions.add(e.pos.asLong());
+        }
+        return positions.size();
+    }
+
     @Nullable
     private static Display.BlockDisplay createDisplay(ServerLevel level, BlockPos pos, DecorationPiece.Part part, float yaw) {
         Display.BlockDisplay d = EntityType.BLOCK_DISPLAY.create(level);

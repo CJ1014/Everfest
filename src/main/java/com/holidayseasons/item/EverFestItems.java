@@ -85,6 +85,21 @@ public final class EverFestItems {
     public static final DeferredItem<BlockItem> WREATH = ITEMS.registerSimpleBlockItem(EverFestBlocks.WREATH);
     public static final DeferredItem<BlockItem> STRING_LIGHTS = ITEMS.registerSimpleBlockItem(EverFestBlocks.STRING_LIGHTS);
 
+    // ---- spring, valentines, harvest
+    public static final DeferredItem<Item> EASTER_EGG_PINK = ITEMS.registerSimpleItem("easter_egg_pink", new Item.Properties());
+    public static final DeferredItem<Item> EASTER_EGG_BLUE = ITEMS.registerSimpleItem("easter_egg_blue", new Item.Properties());
+    public static final DeferredItem<Item> EASTER_EGG_YELLOW = ITEMS.registerSimpleItem("easter_egg_yellow", new Item.Properties());
+    public static final DeferredItem<Item> EASTER_EGG_GREEN = ITEMS.registerSimpleItem("easter_egg_green", new Item.Properties());
+    public static final DeferredItem<Item> GOLDEN_EGG = ITEMS.registerSimpleItem("golden_egg", new Item.Properties().rarity(Rarity.RARE).stacksTo(16));
+    public static final TagKey<Item> EGG_TAG = TagKey.create(Registries.ITEM, EverFest.id("easter_eggs"));
+    public static final DeferredItem<EasterBasketItem> EASTER_BASKET = ITEMS.register("easter_basket",
+            () -> new EasterBasketItem(new Item.Properties().stacksTo(1).component(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY)));
+    public static final DeferredItem<Item> CHOCOLATE_BOX = ITEMS.register("chocolate_box", () -> new Item(new Item.Properties()
+            .food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.4f).alwaysEdible()
+                    .effect(() -> new MobEffectInstance(MobEffects.REGENERATION, 100, 0), 1f).build())));
+    public static final DeferredItem<Item> HARVEST_PIE = ITEMS.register("harvest_pie", () -> new Item(new Item.Properties()
+            .food(new FoodProperties.Builder().nutrition(10).saturationModifier(0.7f).build())));
+
     // ---- spawn eggs
     public static final DeferredItem<DeferredSpawnEggItem> GHOST_SPAWN_EGG = ITEMS.register("ghost_spawn_egg",
             () -> new DeferredSpawnEggItem(EverFestEntities.GHOST, 0xE8F0FF, 0x7A8CB8, new Item.Properties()));

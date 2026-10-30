@@ -70,7 +70,7 @@ public final class GiftService {
         }
 
         /** Records {@code key}; returns false if it was already claimed. */
-        boolean claim(String key) {
+        public boolean claim(String key) {
             boolean added = keys.add(key);
             if (added) setDirty();
             return added;
@@ -128,6 +128,22 @@ public final class GiftService {
         player.displayClientMessage(Component.translatable("holidayseasons.gift.wishes", v.getDisplayName(), joined), false);
         if (v.level() instanceof ServerLevel level) {
             level.sendParticles(ParticleTypes.HAPPY_VILLAGER, v.getX(), v.getY() + v.getBbHeight() + 0.3, v.getZ(), 3, 0.3, 0.2, 0.3, 0);
+        }
+        return true;
+    }
+
+    /** Valentine's Day: chocolates or a flower for a villager. One reputation reward per villager per player. */
+    public boolean giveValentine(Player player, Villager v, ItemStack stack) {
+        CelebrationDirector.Festival f = services.director().festival();
+        if (f == null || !f.holiday().id().equals(EverFest.MOD_ID + ":valentines") || f.phase() == HolidayPhase.CLEANUP) return false;
+        if (!stack.is(EverFestItems.CHOCOLATE_BOX.get()) && !stack.is(net.minecraft.tags.ItemTags.SMALL_FLOWERS)) return false;
+        if (!player.getAbilities().instabuild) stack.shrink(1);
+        ServerLevel level = (ServerLevel) v.level();
+        level.sendParticles(ParticleTypes.HEART, v.getX(), v.getY() + v.getBbHeight() + 0.3, v.getZ(), 5, 0.4, 0.3, 0.4, 0.02);
+        level.playSound(null, v.getX(), v.getY(), v.getZ(), SoundEvents.VILLAGER_CELEBRATE, SoundSource.NEUTRAL, 1f, v.isBaby() ? 1.6f : 1.1f);
+        String village = services.director().resolveVillage(v).key();
+        if (claims.claim("valentine|" + f.occurrence().key() + "|" + player.getUUID() + "|" + v.getUUID())) {
+            services.reputation().add(player.getUUID(), village, ReputationMath.Action.GAVE_PRESENT, services.calendar().snapshot().epochDay());
         }
         return true;
     }

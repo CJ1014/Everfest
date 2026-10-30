@@ -55,6 +55,7 @@ public final class EverFest {
             e.register(com.holidayseasons.gametest.VillageGameTests.class);
             e.register(com.holidayseasons.gametest.HalloweenGameTests.class);
             e.register(com.holidayseasons.gametest.ChristmasGameTests.class);
+            e.register(com.holidayseasons.gametest.SpringGameTests.class);
         });
 
         NeoForge.EVENT_BUS.addListener(this::onServerStarted);
@@ -129,12 +130,24 @@ public final class EverFest {
         }
     }
 
-    /** Players hand candy to children, give presents, and hear villagers' Christmas wishes. */
+    /** Players hand candy to children, give presents, find Easter eggs and hear villagers' Christmas wishes. */
     private void onEntityInteract(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteract event) {
-        if (event.getLevel().isClientSide() || !(event.getTarget() instanceof net.minecraft.world.entity.npc.Villager child)) return;
+        if (event.getLevel().isClientSide()) return;
         EverFestServer s = EverFestServer.get();
         if (s == null) return;
+        if (event.getTarget() instanceof net.minecraft.world.entity.Interaction hitbox && com.holidayseasons.event.EasterService.isEgg(hitbox)) {
+            s.easter().collect(event.getEntity(), hitbox);
+            event.setCanceled(true);
+            event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+            return;
+        }
+        if (!(event.getTarget() instanceof net.minecraft.world.entity.npc.Villager child)) return;
         net.minecraft.world.item.ItemStack held = event.getItemStack();
+        if (s.gifts().giveValentine(event.getEntity(), child, held)) {
+            event.setCanceled(true);
+            event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+            return;
+        }
         if (held.getItem() instanceof com.holidayseasons.item.PresentItem) {
             if (s.gifts().giveToVillager(event.getEntity(), child, held) >= 0) {
                 event.setCanceled(true);

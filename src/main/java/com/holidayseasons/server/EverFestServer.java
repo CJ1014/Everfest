@@ -31,6 +31,8 @@ public final class EverFestServer {
     private final ReputationData reputation;
     private final com.holidayseasons.event.HalloweenService halloween;
     private final com.holidayseasons.event.GiftService gifts;
+    private final com.holidayseasons.event.EasterService easter;
+    private final com.holidayseasons.event.FireworkShowService shows;
 
     private EverFestServer(MinecraftServer server) {
         this.server = server;
@@ -41,6 +43,16 @@ public final class EverFestServer {
         this.director = new CelebrationDirector(server, calendar, holidays);
         this.halloween = new com.holidayseasons.event.HalloweenService(server, this);
         this.gifts = new com.holidayseasons.event.GiftService(server, this);
+        this.easter = new com.holidayseasons.event.EasterService(this);
+        this.shows = new com.holidayseasons.event.FireworkShowService(server, this);
+    }
+
+    public com.holidayseasons.event.EasterService easter() {
+        return easter;
+    }
+
+    public com.holidayseasons.event.FireworkShowService shows() {
+        return shows;
     }
 
     public com.holidayseasons.event.GiftService gifts() {
@@ -124,5 +136,6 @@ public final class EverFestServer {
         director.tick();
         halloween.tick();
         gifts.tick();
+        shows.tick();
     }
 }

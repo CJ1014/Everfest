@@ -345,6 +345,7 @@ public final class CelebrationDirector {
         boolean active = f != null && f.phase() == HolidayPhase.ACTIVE;
         com.holidayseasons.server.EverFestServer services = com.holidayseasons.server.EverFestServer.get();
         if (services != null) services.halloween().updateCostume(v, f, today);
+        if (!v.isTrading()) com.holidayseasons.event.HolidayTrades.apply(v, f);
         if (cfg(() -> ServerConfig.INSTANCE.festivalSchedules.get(), true)) {
             HolidayBrainInjector.applySchedule(v, active, active && f.has("party"), active && f.has("trick_or_treat"));
         }
@@ -434,6 +435,20 @@ public final class CelebrationDirector {
                 if (player != null && random.nextBoolean()) yield new GiftExchangeTask(occ, lv.key, player, services.gifts());
                 Villager partner = findPartner(v, lv);
                 yield partner == null ? null : new GiftExchangeTask(occ, lv.key, partner, null);
+            }
+            case HIDE_EGGS -> {
+                var services = com.holidayseasons.server.EverFestServer.get();
+                if (services == null || services.easter().easter() == null) yield null;
+                if (ledger.countPieces(lv.key, occ, com.holidayseasons.event.EasterService.PIECE_ID) >= services.easter().eggsPerVillage(f)) yield null;
+                BlockPos spot = findSpot(level, lv.centre, 3, cfgInt(() -> ServerConfig.INSTANCE.decorationRadius.get(), 20), 1);
+                if (spot == null || services.homes().blocksVillagerDecorations(level.dimension(), spot)) yield null;
+                yield new HideEggsTask(occ, lv.key, spot, services.easter());
+            }
+            case EGG_HUNT -> {
+                var services = com.holidayseasons.server.EverFestServer.get();
+                if (services == null) yield null;
+                var egg = services.easter().nearestEgg(level, v.blockPosition(), 32);
+                yield egg == null ? new GatherTask(occ, lv.key, centre, standingSpot(level, centre, 2, 6), 200) : new EggHuntTask(occ, lv.key, services.easter(), egg);
             }
             case HAND_OUT_CANDY -> {
                 var services = com.holidayseasons.server.EverFestServer.get();
@@ -537,7 +552,9 @@ public final class CelebrationDirector {
     private static ItemStack feastFood(Festival f) {
         String id = f.holiday().id();
         if (id.endsWith("christmas")) return new ItemStack(Items.COOKIE);
-        if (id.endsWith("thanksgiving") || id.endsWith("halloween")) return new ItemStack(Items.PUMPKIN_PIE);
+        if (id.endsWith("thanksgiving")) return new ItemStack(com.holidayseasons.item.EverFestItems.HARVEST_PIE.get());
+        if (id.endsWith("halloween")) return new ItemStack(Items.PUMPKIN_PIE);
+        if (id.endsWith("valentines")) return new ItemStack(com.holidayseasons.item.EverFestItems.CHOCOLATE_BOX.get());
         if (id.endsWith("independence_day")) return new ItemStack(Items.COOKED_BEEF);
         return new ItemStack(Items.BREAD);
     }

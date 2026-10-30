@@ -272,5 +272,15 @@
   "holidayseasons.reputation.tier.neighbour": "Neighbour",
   "holidayseasons.reputation.tier.friend": "Friend",
   "holidayseasons.reputation.tier.cherished": "Cherished",
-  "holidayseasons.reputation.tier.legend": "Legend"
+  "holidayseasons.reputation.tier.legend": "Legend",
+  "item.holidayseasons.easter_egg_pink": "Pink Easter Egg",
+  "item.holidayseasons.easter_egg_blue": "Blue Easter Egg",
+  "item.holidayseasons.easter_egg_yellow": "Yellow Easter Egg",
+  "item.holidayseasons.easter_egg_green": "Green Easter Egg",
+  "item.holidayseasons.golden_egg": "Golden Egg",
+  "item.holidayseasons.easter_basket": "Easter Basket",
+  "item.holidayseasons.chocolate_box": "Box of Chocolates",
+  "item.holidayseasons.harvest_pie": "Harvest Pie",
+  "holidayseasons.easter.golden": "You found a Golden Egg! What luck!",
+  "holidayseasons.new_year.happy": "Happy New Year!"
 }

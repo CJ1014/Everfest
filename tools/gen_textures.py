@@ -927,6 +927,112 @@ def beanie():
     return img
 
 
+
+# ----------------------------------------------------------------------------------------------- spring and feasts
+
+EGG_ROWS = [
+    "................",
+    "................",
+    "......AAAA......",
+    ".....AAAAAA.....",
+    "....AHAAAAAA....",
+    "....AHAAAAAA....",
+    "...BBBBBBBBBB...",
+    "...AAAAAAAAAA...",
+    "...ACACACACAA...",
+    "...AAAAAAAAAA...",
+    "...BBBBBBBBBB...",
+    "....AAAAAAAA....",
+    "....AAAAAAAA....",
+    ".....aaaaaa.....",
+    "................",
+    "................",
+]
+
+
+def egg(base, band, dot):
+    def make():
+        return from_map(EGG_ROWS, {"A": base, "a": shade(base, 0.8), "H": shade(base, 1.25), "B": band, "C": dot})
+    return make
+
+
+TEXTURES["item/easter_egg_pink.png"] = egg(hexc("f4a6c8"), hexc("ffffff"), hexc("8e44ad"))
+TEXTURES["item/easter_egg_blue.png"] = egg(hexc("8cc8f0"), hexc("f6c843"), hexc("ffffff"))
+TEXTURES["item/easter_egg_yellow.png"] = egg(hexc("f6e070"), hexc("e07b1a"), hexc("4fae6a"))
+TEXTURES["item/easter_egg_green.png"] = egg(hexc("a8e08a"), hexc("e84a7f"), hexc("ffffff"))
+TEXTURES["item/golden_egg.png"] = egg(hexc("f0c040"), hexc("fff2a8"), hexc("c08a20"))
+
+
+@texture("item/easter_basket.png")
+def easter_basket():
+    rows = [
+        "................",
+        "....HHHHHHHH....",
+        "...H........H...",
+        "...H........H...",
+        "...H.PB..YG.H...",
+        "..WWWWWWWWWWWW..",
+        "..WwWwWwWwWwWW..",
+        "..WWWWWWWWWWWW..",
+        "...WwWwWwWwWW...",
+        "...WWWWWWWWWW...",
+        "....WwWwWwWW....",
+        "....wwwwwwww....",
+        "................",
+        "................",
+        "................",
+        "................",
+    ]
+    return from_map(rows, {"H": hexc("a8784a"), "W": hexc("c8955a"), "w": hexc("8a6038"), "P": hexc("f4a6c8"), "B": hexc("8cc8f0"),
+                           "Y": hexc("f6e070"), "G": hexc("a8e08a")})
+
+
+@texture("item/chocolate_box.png")
+def chocolate_box():
+    rows = [
+        "................",
+        "................",
+        "......RR.RR.....",
+        ".....RRRRRRR....",
+        "....RRRRRRRRR...",
+        "....RRRPPRRRR...",
+        "....RRRPPRRRR...",
+        ".....RRRRRRR....",
+        "......RRRRR.....",
+        ".......RRR......",
+        "........R.......",
+        "................",
+        "................",
+        "................",
+        "................",
+        "................",
+    ]
+    return from_map(rows, {"R": hexc("c0283a"), "P": hexc("f4c0d0")})
+
+
+@texture("item/harvest_pie.png")
+def harvest_pie():
+    rows = [
+        "................",
+        "................",
+        "................",
+        "................",
+        "....CCCCCCCC....",
+        "...CFFFFFFFFC...",
+        "..CFFcFFFcFFFC..",
+        "..CFFFFcFFFFFC..",
+        "..CCCCCCCCCCCC..",
+        "..cccccccccccc..",
+        "...cccccccccc...",
+        "................",
+        "................",
+        "................",
+        "................",
+        "................",
+    ]
+    return from_map(rows, {"C": hexc("d8a050"), "c": hexc("a8743a"), "F": hexc("c86a1a"), "f": hexc("a8541a")})
+
+
 def main():
     only = set(sys.argv[1:])
     for path, fn in TEXTURES.items():

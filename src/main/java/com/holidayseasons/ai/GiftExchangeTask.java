@@ -29,7 +29,8 @@ public final class GiftExchangeTask extends CelebrationTask {
 
     @Override
     protected void onStart(ServerLevel level, Villager v) {
-        carry(v, new ItemStack(EverFestItems.PRESENT.get()));
+        // Valentine's gifts are flowers; other holidays bring a wrapped present.
+        carry(v, occurrenceKey.contains(":valentines|") ? new ItemStack(net.minecraft.world.item.Items.POPPY) : new ItemStack(EverFestItems.PRESENT.get()));
     }
 
     @Override
@@ -47,7 +48,7 @@ public final class GiftExchangeTask extends CelebrationTask {
         handing++;
         if (handing == 15) {
             dropCarried(v);
-            if (recipient instanceof ServerPlayer player && gifts != null) {
+            if (recipient instanceof ServerPlayer player && gifts != null && !occurrenceKey.contains(":valentines|")) {
                 gifts.villagerGivesPresent(v, player);
             } else if (recipient instanceof Villager other) {
                 level.sendParticles(ParticleTypes.HAPPY_VILLAGER, other.getX(), other.getY() + other.getBbHeight() + 0.3, other.getZ(), 6, 0.4, 0.3, 0.4, 0);
