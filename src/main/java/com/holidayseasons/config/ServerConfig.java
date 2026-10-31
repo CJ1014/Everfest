@@ -78,6 +78,17 @@ public final class ServerConfig {
     public final ModConfigSpec.BooleanValue halloweenCreatures;
     public final ModConfigSpec.IntValue creaturesPerPlayer;
     public final ModConfigSpec.DoubleValue creatureSpawnChance;
+    // wildlife
+    public final ModConfigSpec.BooleanValue reindeer;
+    public final ModConfigSpec.BooleanValue springBunnies;
+    public final ModConfigSpec.BooleanValue wildTurkeys;
+    public final ModConfigSpec.IntValue seasonalSpawnIntervalTicks;
+    public final ModConfigSpec.DoubleValue seasonalSpawnChance;
+    public final ModConfigSpec.IntValue maxSeasonalAnimalsNearPlayer;
+    // worldgen
+    public final ModConfigSpec.BooleanValue hauntedCottages;
+    public final ModConfigSpec.BooleanValue forgottenGraveyards;
+    public final ModConfigSpec.BooleanValue seasonalCabins;
 
 
     /** Per-holiday overrides for a built-in holiday. Negative numbers / empty strings mean "use the datapack value". */
@@ -240,6 +251,33 @@ public final class ServerConfig {
                 .translation(hw + "creaturesPerPlayer").defineInRange("creaturesPerPlayer", 4, 0, 32);
         creatureSpawnChance = b.comment("Chance per player per second to try spawning a Halloween creature at night.")
                 .translation(hw + "creatureSpawnChance").defineInRange("creatureSpawnChance", 0.08, 0.0, 1.0);
+        b.pop();
+
+        b.comment("Seasonal wildlife. Reindeer spawn naturally in snowy biomes (weights: data/holidayseasons/neoforge/biome_modifier).",
+                "Spring bunnies and wild turkeys visit in their season only, a few at a time near players.").push("wildlife");
+        String wl = "holidayseasons.configuration.wildlife.";
+        reindeer = b.comment("Reindeer spawn in snowy biomes.").translation(wl + "reindeer").define("reindeer", true);
+        springBunnies = b.comment("Spring bunnies appear in spring in grassy and flowery biomes.")
+                .translation(wl + "springBunnies").define("springBunnies", true);
+        wildTurkeys = b.comment("Wild turkeys appear in autumn in woods and meadows.")
+                .translation(wl + "wildTurkeys").define("wildTurkeys", true);
+        seasonalSpawnIntervalTicks = b.comment("How often (ticks) each player is considered for a seasonal animal visit.")
+                .translation(wl + "seasonalSpawnIntervalTicks").defineInRange("seasonalSpawnIntervalTicks", 600, 100, 24000);
+        seasonalSpawnChance = b.comment("Chance per check that a small group of in-season animals arrives near a player.")
+                .translation(wl + "seasonalSpawnChance").defineInRange("seasonalSpawnChance", 0.3, 0.0, 1.0);
+        maxSeasonalAnimalsNearPlayer = b.comment("No more arrive while this many of that species are already within 64 blocks.")
+                .translation(wl + "maxSeasonalAnimalsNearPlayer").defineInRange("maxSeasonalAnimalsNearPlayer", 5, 0, 32);
+        b.pop();
+
+        b.comment("Holiday landmarks generated in new chunks. Turning one off stops it appearing in chunks generated from",
+                "now on; existing ones stay. Where and how often they appear is data-driven (data/holidayseasons/worldgen).").push("worldgen");
+        String wg = "holidayseasons.configuration.worldgen.";
+        hauntedCottages = b.comment("Abandoned haunted cottages in dark forests, swamps and taigas.")
+                .translation(wg + "hauntedCottages").define("hauntedCottages", true);
+        forgottenGraveyards = b.comment("Forgotten graveyards in plains and forests (haunted on Halloween nights).")
+                .translation(wg + "forgottenGraveyards").define("forgottenGraveyards", true);
+        seasonalCabins = b.comment("Snowy seasonal cabins with a hearth a player can claim as a home.")
+                .translation(wg + "seasonalCabins").define("seasonalCabins", true);
         b.pop();
     }
 

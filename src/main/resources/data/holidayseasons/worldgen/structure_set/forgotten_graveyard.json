@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "holidayseasons:forgotten_graveyard",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 34,
+    "separation": 12,
+    "salt": 11022
+  }
+}

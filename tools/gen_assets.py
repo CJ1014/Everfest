@@ -3,6 +3,7 @@
 entries for the Halloween content.  python3 tools/gen_assets.py"""
 import json
 import os
+import re
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src", "main", "resources")
 NS = "holidayseasons"
@@ -244,7 +245,8 @@ def tags():
 
 def sounds():
     names = ["doorbell", "knock", "candy", "candy_bowl_empty", "ghost_moan", "ghost_hurt", "ghost_death", "distant_bell", "eerie_wind",
-             "whispers", "gourdling_hop", "gourdling_hurt", "gourdling_death", "scarecrow_rustle", "scarecrow_creak", "trick_poof"]
+             "whispers", "gourdling_hop", "gourdling_hurt", "gourdling_death", "scarecrow_rustle", "scarecrow_creak", "trick_poof",
+             "turkey_gobble"]
     write(f"{A}/sounds.json", {n: {"sounds": [t(n)], "subtitle": f"subtitles.{NS}.{n}"} for n in names})
     return names
 
@@ -253,7 +255,7 @@ def lang(sound_names):
     p = f"{A}/lang/en_us.json"
     with open(p) as f:
         lang = json.load(f)
-    nice = lambda s: s.replace("_", " ").title()
+    nice = lambda s: " ".join(w[:1].upper() + w[1:] for w in re.sub(r"(?<=[a-z])(?=[A-Z])", " ", s.replace("_", " ")).split())
     for c in CANDY:
         lang[f"item.{NS}.{c}"] = {"candy_corn": "Candy Corn", "caramel_apple": "Caramel Apple", "chocolate_bar": "Chocolate Bar",
                                    "lollipop": "Lollipop", "gummy_bat": "Gummy Bat"}[c]
@@ -295,7 +297,7 @@ def lang(sound_names):
         f"{NS}.home.too_many": "You already have the maximum of %1$s registered homes",
         f"{NS}.home.registered": "Home registered: %s. Visitors will come to the door at %s.",
         f"{NS}.home.registered_no_door": "Home registered: %s. No door found nearby - visitors will come to the hearth.",
-        f"{NS}.home.unregistered": "This hearth isn't linked to a home",
+        f"{NS}.home.unregistered": "Nobody lives here. Sneak and use the hearth to make this house your home",
         f"{NS}.home.belongs_to": "%s - the home of %s",
         f"{NS}.home.not_owner": "Only the owner can change this home",
         f"{NS}.home.saved": "Saved settings for %s",
@@ -333,7 +335,7 @@ def lang(sound_names):
                  "ghost_moan": "Ghost moans", "ghost_hurt": "Ghost wails", "ghost_death": "Ghost fades away", "distant_bell": "Distant bell tolls",
                  "eerie_wind": "Eerie wind", "whispers": "Whispers", "gourdling_hop": "Gourdling hops", "gourdling_hurt": "Gourdling squeaks",
                  "gourdling_death": "Gourdling bursts", "scarecrow_rustle": "Straw rustles", "scarecrow_creak": "Scarecrow creaks",
-                 "trick_poof": "Trick!"}
+                 "trick_poof": "Trick!", "turkey_gobble": "Turkey gobbles"}
     for n in sound_names:
         lang[f"subtitles.{NS}.{n}"] = subtitles[n]
     with open(p, "w") as f:
@@ -516,6 +518,118 @@ def spring_and_feasts():
         f.write("\n")
 
 
+def update_lang(entries):
+    p = f"{A}/lang/en_us.json"
+    with open(p) as f:
+        lang = json.load(f)
+    lang.update(entries)
+    with open(p, "w") as f:
+        json.dump(lang, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+
+
+def entity_loot(mob, pools):
+    write(f"{D}/loot_table/entities/{mob}.json", {"type": "minecraft:entity", "pools": pools, "random_sequence": t("entities/" + mob)})
+
+
+def drop(item, lo, hi, smelt=False):
+    functions = [{"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": lo, "max": hi}}]
+    if smelt:
+        functions.append({"function": "minecraft:furnace_smelt", "conditions": [{"condition": "minecraft:entity_properties",
+                          "entity": "this", "predicate": {"flags": {"is_on_fire": True}}}]})
+    functions.append({"function": "minecraft:enchanted_count_increase", "enchantment": "minecraft:looting", "count": {"min": 0, "max": 1}})
+    return {"rolls": 1, "entries": [{"type": "minecraft:item", "name": item, "functions": functions}]}
+
+
+def wildlife():
+    for n in ("raw_turkey", "roast_turkey"):
+        simple_item(n)
+    for egg in ("reindeer", "spring_bunny", "wild_turkey"):
+        write(f"{A}/models/item/{egg}_spawn_egg.json", {"parent": "minecraft:item/template_spawn_egg"})
+    entity_loot("reindeer", [drop("minecraft:leather", 0, 2)])
+    entity_loot("spring_bunny", [drop("minecraft:rabbit_hide", 0, 1)])
+    entity_loot("wild_turkey", [drop("minecraft:feather", 0, 2), drop(t("raw_turkey"), 1, 1, smelt=True)])
+    for kind, time in (("smelting", 200), ("smoking", 100), ("campfire_cooking", 600)):
+        write(f"{D}/recipe/roast_turkey_from_{kind}.json", {"type": f"minecraft:{kind}", "category": "food",
+              "ingredient": {"item": t("raw_turkey")}, "result": {"id": t("roast_turkey")}, "experience": 0.35, "cookingtime": time})
+    write(f"{D}/tags/item/reindeer_food.json", {"values": ["minecraft:wheat", "minecraft:sweet_berries"]})
+    write(f"{D}/tags/item/turkey_food.json", {"values": ["minecraft:wheat_seeds", "minecraft:pumpkin_seeds", "minecraft:melon_seeds",
+                                                          "minecraft:beetroot_seeds"]})
+    write(os.path.join(ROOT, "data", "minecraft", "tags", "item", "meat.json"), {"replace": False, "values": [t("raw_turkey"), t("roast_turkey")]})
+    write(f"{D}/tags/block/reindeer_spawnable_on.json", {"values": ["minecraft:grass_block", "minecraft:snow", "minecraft:snow_block",
+                                                                     "minecraft:podzol", "minecraft:coarse_dirt"]})
+    write(f"{D}/tags/worldgen/biome/spawns_reindeer.json", {"values": ["minecraft:snowy_plains", "minecraft:snowy_taiga", "minecraft:grove",
+                                                                        "minecraft:snowy_slopes", "minecraft:ice_spikes"]})
+    write(f"{D}/tags/worldgen/biome/spawns_spring_bunnies.json", {"values": ["minecraft:plains", "minecraft:sunflower_plains",
+          "minecraft:meadow", "minecraft:flower_forest", "minecraft:cherry_grove", "minecraft:forest", "minecraft:birch_forest"]})
+    write(f"{D}/tags/worldgen/biome/spawns_wild_turkeys.json", {"values": ["minecraft:forest", "minecraft:birch_forest",
+          "minecraft:old_growth_birch_forest", "minecraft:dark_forest", "minecraft:taiga", "minecraft:old_growth_pine_taiga",
+          "minecraft:old_growth_spruce_taiga", "minecraft:plains", "minecraft:meadow", "minecraft:windswept_forest"]})
+    write(f"{D}/neoforge/biome_modifier/reindeer.json", {"type": "neoforge:add_spawns", "biomes": "#holidayseasons:spawns_reindeer",
+          "spawners": {"type": t("reindeer"), "weight": 5, "minCount": 2, "maxCount": 4}})
+    wl = f"{NS}.configuration.wildlife"
+    update_lang({
+        f"entity.{NS}.reindeer": "Reindeer", f"entity.{NS}.spring_bunny": "Spring Bunny", f"entity.{NS}.wild_turkey": "Wild Turkey",
+        f"item.{NS}.reindeer_spawn_egg": "Reindeer Spawn Egg", f"item.{NS}.spring_bunny_spawn_egg": "Spring Bunny Spawn Egg",
+        f"item.{NS}.wild_turkey_spawn_egg": "Wild Turkey Spawn Egg",
+        f"item.{NS}.raw_turkey": "Raw Turkey", f"item.{NS}.roast_turkey": "Roast Turkey",
+        wl: "Wildlife", f"{wl}.reindeer": "Reindeer", f"{wl}.springBunnies": "Spring Bunnies", f"{wl}.wildTurkeys": "Wild Turkeys",
+        f"{wl}.seasonalSpawnIntervalTicks": "Seasonal Visit Interval (ticks)", f"{wl}.seasonalSpawnChance": "Seasonal Visit Chance",
+        f"{wl}.maxSeasonalAnimalsNearPlayer": "Max Seasonal Animals Near A Player",
+        f"{NS}.configuration.festiveAnimalOutfits": "Festive Animal Outfits",
+    })
+
+
+def chest_loot(name, rolls, entries):
+    """entries: (item, weight, min, max) or (item, weight, min, max, 'enchant')."""
+    out = []
+    for e in entries:
+        item, weight, lo, hi = e[:4]
+        functions = [{"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": lo, "max": hi}}] if hi > 1 else []
+        if len(e) > 4 and e[4] == "enchant":
+            functions = [{"function": "minecraft:enchant_randomly"}]
+        entry = {"type": "minecraft:item", "name": item, "weight": weight}
+        if functions:
+            entry["functions"] = functions
+        out.append(entry)
+    write(f"{D}/loot_table/chests/{name}.json", {"type": "minecraft:chest", "pools": [{"rolls": {"type": "minecraft:uniform", "min": rolls[0],
+          "max": rolls[1]}, "entries": out}], "random_sequence": t("chests/" + name)})
+
+
+def worldgen():
+    landmarks = {
+        "haunted_cottage": (["minecraft:dark_forest", "minecraft:swamp", "minecraft:taiga", "minecraft:old_growth_pine_taiga",
+                             "minecraft:old_growth_spruce_taiga"], 38, 14, 31031, 3),
+        "forgotten_graveyard": (["minecraft:plains", "minecraft:forest", "minecraft:birch_forest", "minecraft:dark_forest",
+                                 "minecraft:taiga", "minecraft:meadow"], 34, 12, 11022, 2),
+        "seasonal_cabin": (["minecraft:snowy_taiga", "minecraft:snowy_plains", "minecraft:grove", "minecraft:taiga"], 34, 12, 12251, 4),
+    }
+    for name, (biomes, spacing, separation, salt, slope) in landmarks.items():
+        write(f"{D}/tags/worldgen/biome/has_structure/{name}.json", {"values": biomes})
+        write(f"{D}/worldgen/structure/{name}.json", {"type": t("holiday_landmark"), "biomes": f"#{NS}:has_structure/{name}",
+              "step": "surface_structures", "terrain_adaptation": "beard_thin", "spawn_overrides": {},
+              "template": t("landmark/" + name), "config_key": name, "max_slope": slope})
+        write(f"{D}/worldgen/structure_set/{name}.json", {"structures": [{"structure": t(name), "weight": 1}],
+              "placement": {"type": "minecraft:random_spread", "spacing": spacing, "separation": separation, "salt": salt}})
+    candy = [(t(c), 6, 1, 4) for c in CANDY]
+    chest_loot("haunted_cottage", (3, 6), candy + [(t("costume_" + c), 2, 1, 1) for c in COSTUMES] + [
+        (t("ectoplasm"), 6, 1, 3), ("minecraft:pumpkin_seeds", 8, 2, 6), (t("carving_knife"), 2, 1, 1), ("minecraft:string", 6, 1, 4),
+        ("minecraft:bone", 6, 1, 4), ("minecraft:emerald", 3, 1, 3), ("minecraft:golden_apple", 1, 1, 1)])
+    chest_loot("forgotten_graveyard", (3, 6), [
+        ("minecraft:bone", 10, 2, 6), ("minecraft:rotten_flesh", 8, 1, 4), (t("ectoplasm"), 6, 1, 3), ("minecraft:candle", 5, 1, 3),
+        ("minecraft:iron_ingot", 4, 1, 3), ("minecraft:gold_nugget", 4, 2, 6), ("minecraft:emerald", 2, 1, 2),
+        (t("tombstone"), 2, 1, 1), (t("costume_skeleton"), 2, 1, 1), ("minecraft:soul_lantern", 2, 1, 1),
+        ("minecraft:book", 1, 1, 1, "enchant")])
+    chest_loot("seasonal_cabin", (3, 6), [
+        ("minecraft:cookie", 10, 3, 8), ("minecraft:sweet_berries", 8, 2, 6), (t("ornament"), 8, 1, 4), (t("santa_hat"), 2, 1, 1),
+        (t("elf_hat"), 2, 1, 1), (t("antlers"), 2, 1, 1), (t("winter_beanie"), 2, 1, 1), ("minecraft:spruce_sapling", 5, 1, 3),
+        ("minecraft:snowball", 6, 2, 8), (t("string_lights"), 3, 1, 3), (t("wreath"), 2, 1, 1), ("minecraft:emerald", 3, 1, 3),
+        ("minecraft:campfire", 2, 1, 1)])
+    wg = f"{NS}.configuration.worldgen"
+    update_lang({wg: "World Generation", f"{wg}.hauntedCottages": "Haunted Cottages", f"{wg}.forgottenGraveyards": "Forgotten Graveyards",
+                 f"{wg}.seasonalCabins": "Seasonal Cabins"})
+
+
 if __name__ == "__main__":
     items()
     blocks()
@@ -525,4 +639,6 @@ if __name__ == "__main__":
     lang(sounds())
     christmas()
     spring_and_feasts()
+    wildlife()
+    worldgen()
     print("assets generated")

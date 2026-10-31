@@ -1,0 +1,145 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 3,
+        "max": 6
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:bone",
+          "weight": 10,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 2,
+                "max": 6
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:rotten_flesh",
+          "weight": 8,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:ectoplasm",
+          "weight": 6,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 3
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:candle",
+          "weight": 5,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 3
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_ingot",
+          "weight": 4,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 3
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:gold_nugget",
+          "weight": 4,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 2,
+                "max": 6
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:emerald",
+          "weight": 2,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:tombstone",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:costume_skeleton",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:soul_lantern",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:enchant_randomly"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "random_sequence": "holidayseasons:chests/forgotten_graveyard"
+}

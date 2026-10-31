@@ -1,0 +1,10 @@
+{
+  "type": "holidayseasons:holiday_landmark",
+  "biomes": "#holidayseasons:has_structure/seasonal_cabin",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "spawn_overrides": {},
+  "template": "holidayseasons:landmark/seasonal_cabin",
+  "config_key": "seasonal_cabin",
+  "max_slope": 4
+}

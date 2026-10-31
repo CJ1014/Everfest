@@ -265,6 +265,23 @@ def trick_poof():
     return normalize(x * 0.7 + sparkle * 0.5)
 
 
+
+@sound("turkey_gobble")
+def turkey_gobble():
+    """A tom's gobble: a quick run of throaty, pitch-bent warble syllables."""
+    out = np.zeros(int(RATE * 0.95))
+    start = 0.0
+    for i, dur in enumerate((0.07, 0.055, 0.05, 0.05, 0.05, 0.05, 0.06, 0.08)):
+        tt = t(dur)
+        f0 = 720 - 35 * i + 160 * np.sin(np.pi * tt / dur)
+        phase = 2 * np.pi * np.cumsum(f0) / RATE
+        voice = sum(np.sin(k * phase) / k for k in range(1, 9))
+        syl = bandpass(voice, 350, 3200) * np.sin(np.pi * tt / dur) ** 0.6
+        out = mix_at(out, syl * (1.0 - 0.05 * i), start)
+        start += dur * 0.92
+    return normalize(reverb(out, 0.15))
+
+
 def write_ogg(name, data):
     os.makedirs(OUT, exist_ok=True)
     pcm = np.clip(data, -1, 1)

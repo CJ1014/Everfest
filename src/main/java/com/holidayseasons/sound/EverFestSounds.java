@@ -27,6 +27,7 @@ public final class EverFestSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> SCARECROW_RUSTLE = reg("scarecrow_rustle");
     public static final DeferredHolder<SoundEvent, SoundEvent> SCARECROW_CREAK = reg("scarecrow_creak");
     public static final DeferredHolder<SoundEvent, SoundEvent> TRICK_POOF = reg("trick_poof");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TURKEY_GOBBLE = reg("turkey_gobble");
 
     private EverFestSounds() {
     }

@@ -108,6 +108,27 @@ public class HolidayHearthBlock extends BaseEntityBlock {
                 home.name(), home.entrance().toShortString()), false);
     }
 
+    /**
+     * A hearth nobody owns (for example in a seasonal cabin found in the wild): sneak-use claims the house, with the
+     * same limits as placing a new hearth.
+     */
+    private static void claimAbandoned(ServerLevel level, BlockPos pos, ServerPlayer player, EverFestServer server) {
+        if (!player.isShiftKeyDown()) {
+            player.displayClientMessage(Component.translatable("holidayseasons.home.unregistered"), true);
+            return;
+        }
+        String problem = server.homes().validate(player.getUUID(), level.dimension(), pos);
+        if (problem != null) {
+            player.displayClientMessage(Component.translatable(problem, HomeRegistry.maxHomesPerPlayer(), HomeRegistry.minDistanceBetweenOwners()), true);
+            return;
+        }
+        HomeRecord home = server.homes().register(level, player.getUUID(), player.getGameProfile().getName(), pos);
+        if (level.getBlockEntity(pos) instanceof HearthBlockEntity be) be.setHomeId(home.id);
+        boolean hasDoor = !home.entrance().equals(pos);
+        player.displayClientMessage(Component.translatable(hasDoor ? "holidayseasons.home.registered" : "holidayseasons.home.registered_no_door",
+                home.name(), home.entrance().toShortString()), false);
+    }
+
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide) return InteractionResult.SUCCESS;
@@ -115,7 +136,7 @@ public class HolidayHearthBlock extends BaseEntityBlock {
         if (server == null || !(player instanceof ServerPlayer sp)) return InteractionResult.FAIL;
         HomeRecord home = server.homes().atHearth(level.dimension(), pos);
         if (home == null) {
-            player.displayClientMessage(Component.translatable("holidayseasons.home.unregistered"), true);
+            claimAbandoned((ServerLevel) level, pos, sp, server);
             return InteractionResult.CONSUME;
         }
         if (home.owner.equals(player.getUUID()) || player.hasPermissions(2)) {

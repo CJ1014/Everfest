@@ -1,0 +1,10 @@
+{
+  "type": "holidayseasons:holiday_landmark",
+  "biomes": "#holidayseasons:has_structure/forgotten_graveyard",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "spawn_overrides": {},
+  "template": "holidayseasons:landmark/forgotten_graveyard",
+  "config_key": "forgotten_graveyard",
+  "max_slope": 2
+}

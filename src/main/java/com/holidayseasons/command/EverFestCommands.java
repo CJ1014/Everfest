@@ -52,6 +52,7 @@ public final class EverFestCommands {
                                 .then(Commands.argument("owner", net.minecraft.commands.arguments.EntityArgument.player())
                                         .executes(EverFestCommands::registerHome)))));
         HolidayCommands.attach(root);
+        WorldCommands.attach(root);
         dispatcher.register(root);
     }
 

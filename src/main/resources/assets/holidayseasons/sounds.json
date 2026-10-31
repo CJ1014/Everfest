@@ -94,5 +94,11 @@
       "holidayseasons:trick_poof"
     ],
     "subtitle": "subtitles.holidayseasons.trick_poof"
+  },
+  "turkey_gobble": {
+    "sounds": [
+      "holidayseasons:turkey_gobble"
+    ],
+    "subtitle": "subtitles.holidayseasons.turkey_gobble"
   }
 }

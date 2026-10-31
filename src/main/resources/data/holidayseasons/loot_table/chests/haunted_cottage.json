@@ -1,0 +1,215 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 3,
+        "max": 6
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:candy_corn",
+          "weight": 6,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:caramel_apple",
+          "weight": 6,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:chocolate_bar",
+          "weight": 6,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:lollipop",
+          "weight": 6,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:gummy_bat",
+          "weight": 6,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:costume_pumpkin",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:costume_ghost",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:costume_skeleton",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:costume_witch",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:costume_vampire",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:costume_scarecrow",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:costume_bat",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:costume_black_cat",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:ectoplasm",
+          "weight": 6,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 3
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:pumpkin_seeds",
+          "weight": 8,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 2,
+                "max": 6
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "holidayseasons:carving_knife",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:string",
+          "weight": 6,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:bone",
+          "weight": 6,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:emerald",
+          "weight": 3,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 3
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:golden_apple",
+          "weight": 1
+        }
+      ]
+    }
+  ],
+  "random_sequence": "holidayseasons:chests/haunted_cottage"
+}

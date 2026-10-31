@@ -1,0 +1,10 @@
+{
+  "type": "holidayseasons:holiday_landmark",
+  "biomes": "#holidayseasons:has_structure/haunted_cottage",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "spawn_overrides": {},
+  "template": "holidayseasons:landmark/haunted_cottage",
+  "config_key": "haunted_cottage",
+  "max_slope": 3
+}

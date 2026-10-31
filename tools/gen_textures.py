@@ -1033,6 +1033,333 @@ def harvest_pie():
     return from_map(rows, {"C": hexc("d8a050"), "c": hexc("a8743a"), "F": hexc("c86a1a"), "f": hexc("a8541a")})
 
 
+
+# ----------------------------------------------------------------------------------------------- wildlife
+
+def vgrad(img, box, top, bottom, spread, seed):
+    """Vertical gradient with a little noise."""
+    rnd = random.Random(seed)
+    px = img.load()
+    x0, y0, x1, y1 = box
+    rows = max(1, y1 - y0 - 1)
+    for y in range(y0, y1):
+        f = (y - y0) / rows
+        base = tuple(int(top[i] + (bottom[i] - top[i]) * f) for i in range(3)) + (255,)
+        for x in range(x0, x1):
+            px[x, y] = shade(base, 1.0 + rnd.uniform(-spread, spread))
+
+
+def paint_faces(img, u, v, w, h, d, colors, spread=0.05, seed=0):
+    """colors: dict face -> color (missing faces use colors['all'])."""
+    for face, box in box_faces(u, v, w, h, d).items():
+        noise_fill(img, box, colors.get(face, colors.get("all")), spread, seed + _h(face) % 97)
+
+
+def reindeer(coat):
+    base = {"brown": hexc("7a5634"), "frosty": hexc("b9b1a6"), "festive": hexc("7a5634")}[coat]
+    back = {"brown": hexc("5e4128"), "frosty": hexc("8f867b"), "festive": hexc("5e4128")}[coat]
+    belly = {"brown": hexc("c8b08a"), "frosty": hexc("ece6dc"), "festive": hexc("c8b08a")}[coat]
+    mane = {"brown": hexc("e6d9bf"), "frosty": hexc("f6f3ee"), "festive": hexc("e6d9bf")}[coat]
+    leg = {"brown": hexc("4e3622"), "frosty": hexc("7d746a"), "festive": hexc("4e3622")}[coat]
+    seed = 300 + _h(coat) % 50
+    img = canvas(64, 64)
+    # body 8x8x14 at (0,0)
+    f = box_faces(0, 0, 8, 8, 14)
+    noise_fill(img, f["top"], back, 0.06, seed)
+    noise_fill(img, f["bottom"], belly, 0.05, seed + 1)
+    for side in ("right", "left"):
+        vgrad(img, f[side], back, belly, 0.06, seed + 2)
+    vgrad(img, f["front"], mane, base, 0.05, seed + 3)      # chest
+    noise_fill(img, f["back"], mane, 0.04, seed + 4)         # pale rump
+    # neck 4x8x4 at (44,0): a pale ruff
+    paint_faces(img, 44, 0, 4, 8, 4, {"all": mane, "top": base}, 0.05, seed + 5)
+    # head 5x5x7 at (0,22)
+    hf = box_faces(0, 22, 5, 5, 7)
+    paint_faces(img, 0, 22, 5, 5, 7, {"all": base, "top": back}, 0.05, seed + 6)
+    fx, fy, _, _ = hf["front"]
+    img.putpixel((fx, fy + 1), hexc("1a1210"))
+    img.putpixel((fx + 4, fy + 1), hexc("1a1210"))
+    img.putpixel((fx, fy), hexc("f2ede4"))
+    img.putpixel((fx + 4, fy), hexc("f2ede4"))
+    # snout, nose, ears
+    paint_faces(img, 24, 22, 3, 3, 3, {"all": shade(belly, 0.85)}, 0.05, seed + 7)
+    nose = hexc("d62a2a") if coat == "festive" else hexc("2a2222")
+    paint_faces(img, 36, 22, 2, 2, 1, {"all": nose}, 0.03, seed + 8)
+    ef = box_faces(42, 22, 3, 2, 1)
+    paint_faces(img, 42, 22, 3, 2, 1, {"all": base}, 0.05, seed + 9)
+    noise_fill(img, ef["front"], hexc("d8a8a0"), 0.05, seed + 10)
+    # antlers
+    antler = hexc("cdb88e")
+    for (u, v, w, h, d) in ((44, 12, 1, 7, 1), (48, 12, 1, 1, 3), (48, 16, 3, 1, 1)):
+        paint_faces(img, u, v, w, h, d, {"all": antler}, 0.08, seed + u + v)
+    # legs 2x10x2 at (0,34): hooves at the bottom
+    lf = box_faces(0, 34, 2, 10, 2)
+    for face in ("right", "front", "left", "back"):
+        x0, y0, x1, y1 = lf[face]
+        noise_fill(img, (x0, y0, x1, y1 - 2), leg, 0.06, seed + 11)
+        noise_fill(img, (x0, y1 - 2, x1, y1), hexc("221a14"), 0.05, seed + 12)
+    noise_fill(img, lf["top"], leg, 0.05, seed + 13)
+    noise_fill(img, lf["bottom"], hexc("221a14"), 0.05, seed + 14)
+    # tail
+    paint_faces(img, 8, 34, 3, 3, 1, {"all": mane}, 0.04, seed + 15)
+    if coat == "festive":
+        # red ribbon collar with a little gold bell around the bottom of the neck
+        nf = box_faces(44, 0, 4, 8, 4)
+        for face in ("right", "front", "left", "back"):
+            x0, y0, x1, y1 = nf[face]
+            rect(img, x0, y1 - 2, x1, y1 - 1, hexc("b8222a"))
+            rect(img, x0, y1 - 1, x1, y1, hexc("8e1820"))
+        x0, y0, x1, y1 = nf["front"]
+        img.putpixel((x0 + 1, y1 - 1), hexc("f0c040"))
+        img.putpixel((x0 + 2, y1 - 1), hexc("d4a020"))
+    return img
+
+
+@texture("entity/reindeer/brown.png")
+def reindeer_brown():
+    return reindeer("brown")
+
+
+@texture("entity/reindeer/frosty.png")
+def reindeer_frosty():
+    return reindeer("frosty")
+
+
+@texture("entity/reindeer/festive.png")
+def reindeer_festive():
+    return reindeer("festive")
+
+
+@texture("entity/reindeer/nose_glow.png")
+def reindeer_nose_glow():
+    img = canvas(64, 64)
+    paint_faces(img, 36, 22, 2, 2, 1, {"all": hexc("ff4a3a")}, 0.04, 360)
+    return img
+
+
+def spring_bunny(coat):
+    fur = {"cream": hexc("f3e6cf"), "blush": hexc("f2c9d6"), "sky": hexc("c4dcf2"), "lilac": hexc("d9c8ef")}[coat]
+    light = hexc("fbf8f4")
+    seed = 400 + _h(coat) % 50
+    img = canvas(64, 32)
+    bf = box_faces(0, 0, 6, 5, 10)
+    paint_faces(img, 0, 0, 6, 5, 10, {"all": fur, "bottom": light}, 0.05, seed)
+    for side in ("right", "left"):
+        vgrad(img, bf[side], fur, light, 0.04, seed + 1)
+    paint_faces(img, 32, 0, 5, 4, 5, {"all": fur}, 0.05, seed + 2)
+    hx, hy, _, _ = box_faces(32, 0, 5, 4, 5)["front"]
+    img.putpixel((hx, hy + 1), hexc("2a2030"))
+    img.putpixel((hx + 4, hy + 1), hexc("2a2030"))
+    rect(img, hx + 1, hy + 3, hx + 4, hy + 4, light)
+    for u in (52, 58):
+        ef = box_faces(u, 0, 2, 5, 1)
+        paint_faces(img, u, 0, 2, 5, 1, {"all": fur}, 0.05, seed + u)
+        noise_fill(img, ef["front"], hexc("f0a8b8"), 0.04, seed + u + 1)
+    paint_faces(img, 52, 6, 3, 3, 2, {"all": light}, 0.03, seed + 3)
+    paint_faces(img, 32, 9, 1, 1, 1, {"all": hexc("e88aa0")}, 0.02, seed + 4)
+    for u in (0, 8):
+        paint_faces(img, u, 15, 2, 7, 2, {"all": light}, 0.04, seed + 5)
+    for u in (16, 30):
+        paint_faces(img, u, 15, 2, 4, 5, {"all": fur}, 0.05, seed + 6)
+    for u in (8, 26):
+        paint_faces(img, u, 24, 2, 1, 7, {"all": light}, 0.04, seed + 7)
+    return img
+
+
+for _coat in ("cream", "blush", "sky", "lilac"):
+    texture(f"entity/spring_bunny/{_coat}.png")(lambda c=_coat: spring_bunny(c))
+
+
+@texture("entity/wild_turkey.png")
+def wild_turkey():
+    img = canvas(64, 32)
+    bronze = hexc("5a3f2a")
+    sheen = hexc("7d5c35")
+    dark = hexc("2e2018")
+    # body 6x7x8 at (0,0): scalloped bronze feathers
+    bf = box_faces(0, 0, 6, 7, 8)
+    for face, box in bf.items():
+        noise_fill(img, box, bronze, 0.08, 500 + _h(face) % 50)
+        x0, y0, x1, y1 = box
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                if (y - y0) % 2 == 1 and (x + y) % 3 == 0:
+                    img.putpixel((x, y), sheen)
+                elif (y - y0) % 3 == 2 and (x + y) % 2 == 0:
+                    img.putpixel((x, y), dark)
+    fx0, fy0, fx1, fy1 = bf["front"]
+    rect(img, fx0 + 2, fy0 + 2, fx0 + 4, fy0 + 6, hexc("17110c"))  # beard
+    # tail fan 10x9x1 at (28,0): bands from the base out to cream tips, rounded top corners
+    tf = box_faces(28, 0, 10, 9, 1)
+    bands = [hexc("e6d6ae"), hexc("e6d6ae"), hexc("22180f"), hexc("8a5a2e"), hexc("7a4e26"), hexc("6a4422"),
+             hexc("5a3f2a"), hexc("4a3322"), hexc("3a281c")]
+    for face in ("front", "back"):
+        x0, y0, x1, y1 = tf[face]
+        for y in range(y0, y1):
+            noise_fill(img, (x0, y, x1, y + 1), bands[y - y0], 0.07, 520 + y)
+        for (dx, dy) in ((0, 0), (1, 0), (0, 1), (9, 0), (8, 0), (9, 1)):
+            img.putpixel((x0 + dx, y0 + dy), (0, 0, 0, 0))
+    for face in ("top", "bottom", "right", "left"):
+        noise_fill(img, tf[face], hexc("6a4422"), 0.06, 530)
+    # neck/head 2x5x2 at (50,0): pale blue-grey head, red throat
+    nf = box_faces(50, 0, 2, 5, 2)
+    for face, (x0, y0, x1, y1) in nf.items():
+        if face in ("top", "bottom"):
+            noise_fill(img, (x0, y0, x1, y1), hexc("aebccc"), 0.04, 540)
+        else:
+            noise_fill(img, (x0, y0, x1, y0 + 2), hexc("aebccc"), 0.04, 541)
+            noise_fill(img, (x0, y0 + 2, x1, y1), hexc("c0302a"), 0.05, 542)
+    x0, y0, _, _ = nf["front"]
+    img.putpixel((x0, y0), hexc("1a1414"))
+    img.putpixel((x0 + 1, y0), hexc("1a1414"))
+    paint_faces(img, 58, 0, 1, 1, 2, {"all": hexc("c8b088")}, 0.04, 543)
+    paint_faces(img, 58, 3, 1, 3, 1, {"all": hexc("b42020")}, 0.05, 544)
+    paint_faces(img, 0, 15, 1, 4, 1, {"all": hexc("b89a8a")}, 0.05, 545)
+    paint_faces(img, 4, 15, 3, 1, 3, {"all": hexc("a88a7a")}, 0.05, 546)
+    # wings 1x5x6 at (16,19): barred flight feathers
+    wf = box_faces(16, 19, 1, 5, 6)
+    for face, (x0, y0, x1, y1) in wf.items():
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                img.putpixel((x, y), hexc("cbb893") if (x + (y - y0) // 2) % 2 == 0 else hexc("4e3826"))
+    return img
+
+
+# ---- festive outfits for vanilla animals (overlays drawn on the animals' own models)
+
+def knit_band(img, box, rows, colors):
+    x0, y0, x1, _ = box
+    for r in range(rows):
+        for x in range(x0, x1):
+            img.putpixel((x, y0 + r), colors[(x + r) % len(colors)])
+
+
+@texture("entity/outfit/sheep_scarf.png")
+def sheep_scarf():
+    img = canvas(64, 32)
+    red, green, white = hexc("c0392b"), hexc("2f7a3a"), hexc("f4f1ea")
+    f = box_faces(28, 8, 8, 16, 6)
+    for face in ("right", "front", "left", "back"):
+        x0, y0, x1, y1 = f[face]
+        knit_band(img, (x0, y0 + 1, x1, y1), 3, [red, red, green, green])
+        rect(img, x0, y0 + 4, x1, y0 + 5, white)
+    # the loose end hangs down one side
+    x0, y0, _, _ = f["right"]
+    for y in range(y0 + 5, y0 + 11):
+        img.putpixel((x0 + 1, y), red if (y // 2) % 2 == 0 else green)
+        img.putpixel((x0 + 2, y), red if (y // 2) % 2 == 0 else green)
+    img.putpixel((x0 + 1, y0 + 11), white)
+    img.putpixel((x0 + 2, y0 + 11), white)
+    return img
+
+
+@texture("entity/outfit/cow_bell_collar.png")
+def cow_bell_collar():
+    img = canvas(64, 32)
+    leather, stitch, gold, gold_d = hexc("6a3a1e"), hexc("8e5a2e"), hexc("e8b830"), hexc("a87a18")
+    f = box_faces(18, 4, 12, 18, 10)
+    for face in ("right", "front", "left", "back"):
+        x0, y0, x1, y1 = f[face]
+        rect(img, x0, y0 + 1, x1, y0 + 3, leather)
+        for x in range(x0, x1, 2):
+            img.putpixel((x, y0 + 1), stitch)
+    x0, y0, x1, _ = f["front"]
+    cx = (x0 + x1) // 2
+    rect(img, cx - 1, y0 + 3, cx + 2, y0 + 6, gold)
+    img.putpixel((cx + 1, y0 + 3), gold_d)
+    img.putpixel((cx + 1, y0 + 5), gold_d)
+    img.putpixel((cx, y0 + 6), hexc("3a2a10"))
+    x0, y0, x1, _ = f["back"]
+    rect(img, x0 + 4, y0 + 1, x0 + 7, y0 + 3, gold)
+    return img
+
+
+@texture("entity/outfit/wolf_bandana.png")
+def wolf_bandana():
+    img = canvas(64, 32)
+    orange, black = hexc("e8781e"), hexc("201810")
+    f = box_faces(21, 0, 8, 6, 7)
+    for face in ("right", "left", "back"):
+        x0, y0, x1, _ = f[face]
+        rect(img, x0, y0, x1, y0 + 2, orange)
+        for x in range(x0, x1, 3):
+            img.putpixel((x, y0), black)
+    x0, y0, x1, _ = f["front"]
+    for r, (a, b) in enumerate(((0, 8), (1, 7), (2, 6), (3, 5))):
+        rect(img, x0 + a, y0 + r, x0 + b, y0 + r + 1, orange)
+    for (dx, dy) in ((1, 0), (5, 0), (3, 1), (2, 2), (5, 2)):
+        img.putpixel((x0 + dx, y0 + dy), black)
+    return img
+
+
+@texture("entity/outfit/rabbit_flower_crown.png")
+def rabbit_flower_crown():
+    img = canvas(64, 32)
+    leaf, pink, yellow, white = hexc("4f8f3a"), hexc("f08ab0"), hexc("f4d04a"), hexc("fbf6ee")
+    f = box_faces(32, 0, 5, 4, 5)
+    flowers = [pink, leaf, yellow, leaf, white]
+    for face in ("right", "front", "left", "back"):
+        x0, y0, x1, _ = f[face]
+        for x in range(x0, x1):
+            img.putpixel((x, y0), flowers[(x - x0 + _h(face)) % len(flowers)])
+    x0, y0, x1, y1 = f["top"]
+    for x in range(x0, x1):
+        img.putpixel((x, y0), leaf)
+        img.putpixel((x, y1 - 1), leaf)
+    for y in range(y0, y1):
+        img.putpixel((x0, y), leaf)
+        img.putpixel((x1 - 1, y), leaf)
+    img.putpixel((x0, y0), pink)
+    img.putpixel((x1 - 1, y1 - 1), yellow)
+    return img
+
+
+@texture("item/raw_turkey.png")
+def raw_turkey():
+    rows = [
+        "................",
+        "................",
+        "......MMMM......",
+        ".....MMmMMM.....",
+        "....MMMMMmMM....",
+        "....MmMMMMMM....",
+        "....MMMMMmMM....",
+        ".....MMmMMM.....",
+        "......MMMM......",
+        ".......MM.......",
+        ".......BB.......",
+        ".......BB.......",
+        "......BbbB......",
+        "......B..B......",
+        "................",
+        "................",
+    ]
+    return from_map(rows, {"M": hexc("e8a0a0"), "m": hexc("f4c8c0"), "B": hexc("f0ece0"), "b": hexc("d8d0bc")})
+
+
+@texture("item/roast_turkey.png")
+def roast_turkey():
+    rows = [
+        "................",
+        "................",
+        "................",
+        "..B.........B...",
+        "..BB.RRRRR.BB...",
+        "...BRRrRRRRB....",
+        "...RRRRRRrRRR...",
+        "..RRrRRRRRRRRR..",
+        "..RRRRRRrRRRRR..",
+        "..RRRRRRRRRrRR..",
+        "...RRrRRRRRRR...",
+        "...PRRRRRRRRP...",
+        "..PPPPPPPPPPPP..",
+        "...PPPPPPPPPP...",
+        "................",
+        "................",
+    ]
+    return from_map(rows, {"R": hexc("b8702a"), "r": hexc("e0a050"), "B": hexc("f0ece0"), "P": hexc("c8ccd4")})
+
+
 def main():
     only = set(sys.argv[1:])
     for path, fn in TEXTURES.items():

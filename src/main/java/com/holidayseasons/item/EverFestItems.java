@@ -100,6 +100,11 @@ public final class EverFestItems {
     public static final DeferredItem<Item> HARVEST_PIE = ITEMS.register("harvest_pie", () -> new Item(new Item.Properties()
             .food(new FoodProperties.Builder().nutrition(10).saturationModifier(0.7f).build())));
 
+    public static final DeferredItem<Item> RAW_TURKEY = ITEMS.register("raw_turkey", () -> new Item(new Item.Properties()
+            .food(new FoodProperties.Builder().nutrition(3).saturationModifier(0.3f).build())));
+    public static final DeferredItem<Item> ROAST_TURKEY = ITEMS.register("roast_turkey", () -> new Item(new Item.Properties()
+            .food(new FoodProperties.Builder().nutrition(8).saturationModifier(0.8f).build())));
+
     // ---- spawn eggs
     public static final DeferredItem<DeferredSpawnEggItem> GHOST_SPAWN_EGG = ITEMS.register("ghost_spawn_egg",
             () -> new DeferredSpawnEggItem(EverFestEntities.GHOST, 0xE8F0FF, 0x7A8CB8, new Item.Properties()));
@@ -107,6 +112,12 @@ public final class EverFestItems {
             () -> new DeferredSpawnEggItem(EverFestEntities.GOURDLING, 0xE07B1A, 0x3A6B1F, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> SCARECROW_SPAWN_EGG = ITEMS.register("scarecrow_spawn_egg",
             () -> new DeferredSpawnEggItem(EverFestEntities.SCARECROW, 0xD9B44A, 0x6B4F2A, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> REINDEER_SPAWN_EGG = ITEMS.register("reindeer_spawn_egg",
+            () -> new DeferredSpawnEggItem(EverFestEntities.REINDEER, 0x7A5634, 0xE9E1D2, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> SPRING_BUNNY_SPAWN_EGG = ITEMS.register("spring_bunny_spawn_egg",
+            () -> new DeferredSpawnEggItem(EverFestEntities.SPRING_BUNNY, 0xF6D6E4, 0xB9D8F2, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> WILD_TURKEY_SPAWN_EGG = ITEMS.register("wild_turkey_spawn_egg",
+            () -> new DeferredSpawnEggItem(EverFestEntities.WILD_TURKEY, 0x4A3526, 0xB8432F, new Item.Properties()));
 
     private EverFestItems() {
     }

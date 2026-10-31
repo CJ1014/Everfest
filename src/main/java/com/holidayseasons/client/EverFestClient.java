@@ -34,6 +34,9 @@ public final class EverFestClient {
         modBus.addListener(EverFestClient::blockColors);
         modBus.addListener(EverFestClient::itemColors);
         modBus.addListener(com.holidayseasons.client.entity.HalloweenRenderers::registerRenderers);
+        modBus.addListener(com.holidayseasons.client.entity.WildlifeRenderers::registerLayers);
+        modBus.addListener(com.holidayseasons.client.entity.WildlifeRenderers::registerRenderers);
+        modBus.addListener(com.holidayseasons.client.entity.WildlifeRenderers::addOutfitLayers);
         NeoForge.EVENT_BUS.addListener(HalloweenAtmosphere::onClientTick);
         NeoForge.EVENT_BUS.addListener(HalloweenAtmosphere::onRenderFog);
         NeoForge.EVENT_BUS.addListener(HalloweenAtmosphere::onFogColor);

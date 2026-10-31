@@ -1,0 +1,10 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "#holidayseasons:spawns_reindeer",
+  "spawners": {
+    "type": "holidayseasons:reindeer",
+    "weight": 5,
+    "minCount": 2,
+    "maxCount": 4
+  }
+}

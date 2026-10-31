@@ -46,6 +46,7 @@ public final class EverFest {
         com.holidayseasons.entity.EverFestEntities.register(modBus);
         com.holidayseasons.sound.EverFestSounds.register(modBus);
         com.holidayseasons.item.EverFestDataComponents.register(modBus);
+        com.holidayseasons.worldgen.EverFestWorldgen.register(modBus);
 
         modBus.addListener(EverFestNetwork::register);
         modBus.addListener(this::commonSetup);
@@ -56,6 +57,8 @@ public final class EverFest {
             e.register(com.holidayseasons.gametest.HalloweenGameTests.class);
             e.register(com.holidayseasons.gametest.ChristmasGameTests.class);
             e.register(com.holidayseasons.gametest.SpringGameTests.class);
+            e.register(com.holidayseasons.gametest.WildlifeGameTests.class);
+            e.register(com.holidayseasons.gametest.WorldGameTests.class);
         });
 
         NeoForge.EVENT_BUS.addListener(this::onServerStarted);

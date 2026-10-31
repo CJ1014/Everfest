@@ -20,6 +20,7 @@ public final class ClientConfig {
     public final ModConfigSpec.BooleanValue halloweenFog;
     public final ModConfigSpec.BooleanValue seasonalParticles;
     public final ModConfigSpec.BooleanValue ambientSounds;
+    public final ModConfigSpec.BooleanValue festiveAnimalOutfits;
 
     private ClientConfig(ModConfigSpec.Builder b) {
         b.comment("Heads-up display").push("hud");
@@ -42,6 +43,8 @@ public final class ClientConfig {
                 .translation("holidayseasons.configuration.seasonalParticles").define("seasonalParticles", true);
         ambientSounds = b.comment("Distant bells, wind and whispers on Halloween nights.")
                 .translation("holidayseasons.configuration.ambientSounds").define("ambientSounds", true);
+        festiveAnimalOutfits = b.comment("Some sheep, cows, wolves and rabbits dress up for the holidays (purely cosmetic).")
+                .translation("holidayseasons.configuration.festiveAnimalOutfits").define("festiveAnimalOutfits", true);
         b.pop();
     }
 }
