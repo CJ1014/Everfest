@@ -100,5 +100,45 @@
       "holidayseasons:turkey_gobble"
     ],
     "subtitle": "subtitles.holidayseasons.turkey_gobble"
+  },
+  "music.lantern_hollow": {
+    "sounds": [
+      {
+        "name": "holidayseasons:music/lantern_hollow",
+        "stream": true
+      }
+    ]
+  },
+  "music.hearthlight": {
+    "sounds": [
+      {
+        "name": "holidayseasons:music/hearthlight",
+        "stream": true
+      }
+    ]
+  },
+  "music.meadow_morning": {
+    "sounds": [
+      {
+        "name": "holidayseasons:music/meadow_morning",
+        "stream": true
+      }
+    ]
+  },
+  "music.harvest_table": {
+    "sounds": [
+      {
+        "name": "holidayseasons:music/harvest_table",
+        "stream": true
+      }
+    ]
+  },
+  "music.midnight_fireworks": {
+    "sounds": [
+      {
+        "name": "holidayseasons:music/midnight_fireworks",
+        "stream": true
+      }
+    ]
   }
 }

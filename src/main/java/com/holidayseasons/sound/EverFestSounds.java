@@ -28,6 +28,12 @@ public final class EverFestSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> SCARECROW_CREAK = reg("scarecrow_creak");
     public static final DeferredHolder<SoundEvent, SoundEvent> TRICK_POOF = reg("trick_poof");
     public static final DeferredHolder<SoundEvent, SoundEvent> TURKEY_GOBBLE = reg("turkey_gobble");
+    // Original holiday music (tools/gen_music.py), streamed.
+    public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_LANTERN_HOLLOW = reg("music.lantern_hollow");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_HEARTHLIGHT = reg("music.hearthlight");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_MEADOW_MORNING = reg("music.meadow_morning");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_HARVEST_TABLE = reg("music.harvest_table");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_MIDNIGHT_FIREWORKS = reg("music.midnight_fireworks");
 
     private EverFestSounds() {
     }

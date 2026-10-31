@@ -1479,6 +1479,33 @@ def snow_globe_tree():
     return img
 
 
+
+# ----------------------------------------------------------------------------------------------- particles
+
+LEAF_SHAPES = [
+    ["..X..", ".XXX.", "XXXXX", ".XXX.", "..S.."],
+    ["...XX", "..XXX", ".XXX.", "XXX..", "S...."],
+    [".X.X.", "XXXXX", ".XXX.", "..X..", "..S.."],
+]
+LEAF_COLOURS = [("e0701e", "a84a10"), ("c0392b", "8a2418"), ("e8b030", "a87a18"), ("9a5a2a", "6a3a18")]
+
+
+def autumn_leaf(i):
+    base, dark = LEAF_COLOURS[i]
+    rows = LEAF_SHAPES[i % len(LEAF_SHAPES)]
+    img = from_map(rows, {"X": hexc(base), "S": hexc("5a3a1a")})
+    px = img.load()
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row):
+            if ch == "X" and (x + y) % 3 == 0:
+                px[x, y] = hexc(dark)
+    return img
+
+
+for _i in range(4):
+    texture(f"particle/autumn_leaf_{_i}.png")(lambda i=_i: autumn_leaf(i))
+
+
 def main():
     only = set(sys.argv[1:])
     for path, fn in TEXTURES.items():

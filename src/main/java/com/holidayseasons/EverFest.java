@@ -47,6 +47,7 @@ public final class EverFest {
         com.holidayseasons.sound.EverFestSounds.register(modBus);
         com.holidayseasons.item.EverFestDataComponents.register(modBus);
         com.holidayseasons.worldgen.EverFestWorldgen.register(modBus);
+        com.holidayseasons.particle.EverFestParticles.register(modBus);
 
         modBus.addListener(EverFestNetwork::register);
         modBus.addListener(this::commonSetup);

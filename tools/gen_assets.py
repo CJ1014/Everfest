@@ -687,6 +687,19 @@ def events_and_parties():
     })
 
 
+MUSIC = ["lantern_hollow", "hearthlight", "meadow_morning", "harvest_table", "midnight_fireworks"]
+
+
+def music_and_particles():
+    with open(f"{A}/sounds.json") as f:
+        sounds = json.load(f)
+    for m in MUSIC:
+        sounds[f"music.{m}"] = {"sounds": [{"name": t("music/" + m), "stream": True}]}
+    write(f"{A}/sounds.json", sounds)
+    write(f"{A}/particles/autumn_leaf.json", {"textures": [t(f"autumn_leaf_{i}") for i in range(4)]})
+    update_lang({f"{NS}.configuration.holidayMusic": "Holiday Music"})
+
+
 if __name__ == "__main__":
     items()
     blocks()
@@ -700,4 +713,5 @@ if __name__ == "__main__":
     worldgen()
     economy()
     events_and_parties()
+    music_and_particles()
     print("assets generated")

@@ -347,5 +347,6 @@
   "holidayseasons.configuration.parties.hearthParties": "Hearth Parties",
   "holidayseasons.configuration.parties.maxPartyGuests": "Max Party Guests",
   "holidayseasons.configuration.parties.partyInviteRadius": "Party Invite Radius",
-  "holidayseasons.configuration.parties.partyDurationTicks": "Party Duration (ticks)"
+  "holidayseasons.configuration.parties.partyDurationTicks": "Party Duration (ticks)",
+  "holidayseasons.configuration.holidayMusic": "Holiday Music"
 }

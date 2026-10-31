@@ -37,6 +37,10 @@ public final class EverFestClient {
         modBus.addListener(com.holidayseasons.client.entity.WildlifeRenderers::registerLayers);
         modBus.addListener(com.holidayseasons.client.entity.WildlifeRenderers::registerRenderers);
         modBus.addListener(com.holidayseasons.client.entity.WildlifeRenderers::addOutfitLayers);
+        modBus.addListener((net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent e) ->
+                e.registerSpriteSet(com.holidayseasons.particle.EverFestParticles.AUTUMN_LEAF.get(),
+                        com.holidayseasons.client.particle.AutumnLeafParticle::provider));
+        NeoForge.EVENT_BUS.addListener(HolidayMusic::onSelectMusic);
         NeoForge.EVENT_BUS.addListener(HalloweenAtmosphere::onClientTick);
         NeoForge.EVENT_BUS.addListener(HalloweenAtmosphere::onRenderFog);
         NeoForge.EVENT_BUS.addListener(HalloweenAtmosphere::onFogColor);

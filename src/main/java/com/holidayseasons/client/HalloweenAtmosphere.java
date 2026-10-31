@@ -60,15 +60,7 @@ public final class HalloweenAtmosphere {
         if (k <= 0) return;
         RandomSource r = level.random;
         CalendarSnapshot snap = ClientCalendarState.snapshot();
-        boolean autumn = snap != null && snap.season() == Season.AUTUMN;
-        if (autumn && ClientConfig.INSTANCE.seasonalParticles.get()) {
-            for (int i = 0; i < (int) (3 * k); i++) {
-                BlockPos p = player.blockPosition().offset(r.nextInt(25) - 12, r.nextInt(10) + 2, r.nextInt(25) - 12);
-                if (level.getBlockState(p).is(net.minecraft.tags.BlockTags.LEAVES) && level.getBlockState(p.below()).isAir()) {
-                    level.addParticle(ParticleTypes.CHERRY_LEAVES, p.getX() + r.nextDouble(), p.getY() - 0.1, p.getZ() + r.nextDouble(), 0, 0, 0);
-                }
-            }
-        }
+        SeasonalAtmosphere.tick(level, player, snap, k, r);
         if (!spooky) return;
         // Wisps drifting in dark places.
         if (r.nextFloat() < 0.15f * k) {

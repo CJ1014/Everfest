@@ -21,6 +21,7 @@ public final class ClientConfig {
     public final ModConfigSpec.BooleanValue seasonalParticles;
     public final ModConfigSpec.BooleanValue ambientSounds;
     public final ModConfigSpec.BooleanValue festiveAnimalOutfits;
+    public final ModConfigSpec.BooleanValue holidayMusic;
 
     private ClientConfig(ModConfigSpec.Builder b) {
         b.comment("Heads-up display").push("hud");
@@ -45,6 +46,9 @@ public final class ClientConfig {
                 .translation("holidayseasons.configuration.ambientSounds").define("ambientSounds", true);
         festiveAnimalOutfits = b.comment("Some sheep, cows, wolves and rabbits dress up for the holidays (purely cosmetic).")
                 .translation("holidayseasons.configuration.festiveAnimalOutfits").define("festiveAnimalOutfits", true);
+        holidayMusic = b.comment("While a holiday is celebrated, EverFest's original holiday music replaces the overworld background music.",
+                        "Its volume follows the Music slider.")
+                .translation("holidayseasons.configuration.holidayMusic").define("holidayMusic", true);
         b.pop();
     }
 }
