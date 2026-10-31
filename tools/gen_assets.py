@@ -630,6 +630,63 @@ def worldgen():
                  f"{wg}.seasonalCabins": "Seasonal Cabins"})
 
 
+def economy():
+    simple_item("holiday_token")
+    write(f"{A}/models/item/holiday_merchant_spawn_egg.json", {"parent": "minecraft:item/template_spawn_egg"})
+    wood, snow, tree, glass = "minecraft:block/dark_oak_planks", "minecraft:block/snow", t("block/snow_globe_tree"), "minecraft:block/glass"
+    write(f"{A}/models/block/snow_globe.json", {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
+          "textures": {"wood": wood, "snow": snow, "tree": tree, "glass": glass, "particle": glass},
+          "display": {"gui": {"rotation": [30, 225, 0], "translation": [0, 2, 0], "scale": [0.9, 0.9, 0.9]},
+                      "ground": {"translation": [0, 3, 0], "scale": [0.5, 0.5, 0.5]},
+                      "fixed": {"scale": [0.8, 0.8, 0.8]},
+                      "thirdperson_righthand": {"rotation": [75, 45, 0], "translation": [0, 2.5, 0], "scale": [0.5, 0.5, 0.5]},
+                      "firstperson_righthand": {"rotation": [0, 45, 0], "scale": [0.5, 0.5, 0.5]}},
+          "elements": [cube([4, 0, 4], [12, 2, 12], "#wood"), cube([5, 2, 5], [11, 3, 11], "#snow"),
+                       cube([6, 3, 6], [10, 5.5, 10], "#tree"), cube([7, 5.5, 7], [9, 8, 9], "#tree"),
+                       cube([4.5, 2, 4.5], [11.5, 10, 11.5], "#glass", faces=("north", "south", "east", "west", "up"))]})
+    write(f"{A}/blockstates/snow_globe.json", facing_variants(t("block/snow_globe")))
+    write(f"{A}/models/item/snow_globe.json", {"parent": t("block/snow_globe")})
+    write(f"{D}/loot_table/blocks/snow_globe.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
+          "entries": [{"type": "minecraft:item", "name": t("snow_globe")}], "conditions": [{"condition": "minecraft:survives_explosion"}]}],
+          "random_sequence": t("blocks/snow_globe")})
+    ec, ev = f"{NS}.configuration.economy", f"{NS}.configuration.events"
+    update_lang({
+        f"item.{NS}.holiday_token": "Festival Token", f"block.{NS}.snow_globe": "Snow Globe",
+        f"item.{NS}.holiday_merchant_spawn_egg": "Holiday Merchant Spawn Egg", f"entity.{NS}.holiday_merchant": "Holiday Merchant",
+        f"item.{NS}.peddlers_lantern": "Peddler's Lantern", f"item.{NS}.peddlers_lantern.lore": "It still smells of fog and candle smoke",
+        f"{NS}.peddler.arrives": "A cloaked peddler steps out of the dark, lantern swinging...",
+        f"{NS}.tokens.earned": "+%s Festival Token (%s)", f"{NS}.tokens.reason.egg": "found an egg",
+        f"{NS}.tokens.reason.present": "a gift well chosen", f"{NS}.tokens.reason.objective": "village objective",
+        f"{NS}.tokens.reason.party": "hosted a party",
+        ec: "Economy", f"{ec}.holidayTokens": "Festival Tokens", f"{ec}.holidayMerchants": "Holiday Merchants",
+        f"{ec}.merchantVisitChance": "Merchant Visit Chance", f"{ec}.merchantStayTicks": "Merchant Stay (ticks)",
+        ev: "Rare Events", f"{ev}.midnightPeddler": "Midnight Peddler", f"{ev}.midnightPeddlerChance": "Midnight Peddler Chance",
+    })
+
+
+def events_and_parties():
+    ev, pa = f"{NS}.configuration.events", f"{NS}.configuration.parties"
+    update_lang({
+        f"{NS}.objective.bar": "Village objective: bring %s %s to the bell (%s/%s)",
+        f"{NS}.objective.done": "Village objective complete: %s. Thank you!",
+        f"{NS}.objective.thanks": "You brought %s %s to the village (%s/%s)",
+        f"{NS}.objective.complete": "The village finished its holiday objective (%s) - they will remember your help!",
+        f"{NS}.objective.tag.candy": "candy", f"{NS}.objective.tag.easter_eggs": "Easter eggs", f"{NS}.objective.tag.small_flowers": "flowers",
+        f"{NS}.graveyard.stirs": "The graves stir... something is rising.",
+        f"{NS}.screen.hearth.party": "Host a holiday party",
+        f"{NS}.party.disabled": "Parties are turned off on this server",
+        f"{NS}.party.no_holiday": "Parties can only be hosted while a holiday is being celebrated",
+        f"{NS}.party.already": "A party is already going on here",
+        f"{NS}.party.nobody": "Nobody nearby accepted your invitation. Get to know the neighbours first!",
+        f"{NS}.party.started": "You invited the neighbours: %s villagers are on their way",
+        f"{NS}.party.arrived": "%s arrived at your party (%s guests)",
+        f"{NS}.party.over": "Your party is over: %s of %s invited villagers came",
+        f"{ev}.villageObjectives": "Village Objectives", f"{ev}.graveyardHaunting": "Graveyard Haunting", f"{ev}.festivalMarkets": "Festival Markets",
+        pa: "Parties", f"{pa}.hearthParties": "Hearth Parties", f"{pa}.maxPartyGuests": "Max Party Guests",
+        f"{pa}.partyInviteRadius": "Party Invite Radius", f"{pa}.partyDurationTicks": "Party Duration (ticks)",
+    })
+
+
 if __name__ == "__main__":
     items()
     blocks()
@@ -641,4 +698,6 @@ if __name__ == "__main__":
     spring_and_feasts()
     wildlife()
     worldgen()
+    economy()
+    events_and_parties()
     print("assets generated")

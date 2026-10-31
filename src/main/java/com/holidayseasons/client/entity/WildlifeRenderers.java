@@ -52,6 +52,7 @@ public final class WildlifeRenderers {
         e.registerEntityRenderer(EverFestEntities.REINDEER.get(), ReindeerRenderer::new);
         e.registerEntityRenderer(EverFestEntities.SPRING_BUNNY.get(), SpringBunnyRenderer::new);
         e.registerEntityRenderer(EverFestEntities.WILD_TURKEY.get(), WildTurkeyRenderer::new);
+        e.registerEntityRenderer(EverFestEntities.HOLIDAY_MERCHANT.get(), MerchantRenderer::new);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

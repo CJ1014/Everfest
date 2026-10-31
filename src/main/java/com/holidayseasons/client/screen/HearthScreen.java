@@ -45,6 +45,10 @@ public class HearthScreen extends Screen {
         addRenderableWidget(CycleButton.<HomeRecord.CandyPolicy>builder(p -> Component.translatable("holidayseasons.candy_policy." + p.name().toLowerCase()))
                 .withValues(HomeRecord.CandyPolicy.values()).withInitialValue(policy)
                 .create(left + 12, top + 108, W - 24, 20, Component.translatable("holidayseasons.screen.hearth.candy"), (b, v) -> policy = v));
+        addRenderableWidget(Button.builder(Component.translatable("holidayseasons.screen.hearth.party"), b -> {
+            PacketDistributor.sendToServer(new com.holidayseasons.network.HostPartyPayload(data.homeId()));
+            onClose();
+        }).bounds(left + 12, top + 134, W - 24, 20).build());
         addRenderableWidget(Button.builder(Component.translatable("holidayseasons.screen.save"), b -> save()).bounds(left + 12, top + H - 28, 110, 20).build());
         addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b -> onClose()).bounds(left + W - 122, top + H - 28, 110, 20).build());
     }

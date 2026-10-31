@@ -230,6 +230,28 @@ public final class CelebrationDirector {
         return out;
     }
 
+    /** Loaded, tracked villagers within {@code radius} of {@code pos} in {@code level}, nearest first. */
+    public List<Villager> villagersNear(ServerLevel level, BlockPos pos, double radius) {
+        List<Villager> out = new ArrayList<>();
+        for (Villager v : tracked.values()) {
+            if (v.isAlive() && v.level() == level && v.distanceToSqr(pos.getCenter()) <= radius * radius) out.add(v);
+        }
+        out.sort(java.util.Comparator.comparingDouble(v -> v.distanceToSqr(pos.getCenter())));
+        return out;
+    }
+
+    /** Withdraws {@code task} from {@code v} if it is still the villager's task (a running task is told to stop). */
+    public void cancel(Villager v, CelebrationTask task) {
+        if (tasks.get(v.getUUID()) != task) return;
+        if (task.isRunning()) {
+            task.fail();
+        } else {
+            tasks.remove(v.getUUID());
+            assignedAt.remove(v.getUUID());
+            manual.remove(v.getUUID());
+        }
+    }
+
     /** Assigns a task directly (GameTests, admin tools). The director will not replace or expire it. */
     public void assign(Villager v, CelebrationTask task) {
         track(v);
@@ -549,7 +571,7 @@ public final class CelebrationDirector {
         return null;
     }
 
-    private static ItemStack feastFood(Festival f) {
+    public static ItemStack feastFood(Festival f) {
         String id = f.holiday().id();
         if (id.endsWith("christmas")) return new ItemStack(Items.COOKIE);
         if (id.endsWith("thanksgiving")) return new ItemStack(com.holidayseasons.item.EverFestItems.HARVEST_PIE.get());

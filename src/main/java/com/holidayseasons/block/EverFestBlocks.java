@@ -50,6 +50,11 @@ public final class EverFestBlocks {
         }
     }
 
+    /** A token-only collectible: a little snowy spruce under glass. */
+    public static final DeferredBlock<DecorBlock> SNOW_GLOBE = BLOCKS.register("snow_globe",
+            () -> new DecorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.ICE).strength(0.5f).sound(SoundType.GLASS)
+                    .noOcclusion().lightLevel(s -> 4), Block.box(4, 0, 4, 12, 10, 12), false, null));
+
     public static final DeferredBlock<DecorBlock> TOMBSTONE = BLOCKS.register("tombstone",
             () -> new DecorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(1.5f, 6f).sound(SoundType.STONE)
                     .noOcclusion().requiresCorrectToolForDrops(), Block.box(3, 0, 6, 13, 13, 10), false, null));

@@ -34,6 +34,10 @@ public final class EverFestServer {
     private final com.holidayseasons.event.EasterService easter;
     private final com.holidayseasons.event.FireworkShowService shows;
     private final com.holidayseasons.entity.WildlifeSpawner wildlife;
+    private final com.holidayseasons.economy.MerchantService merchants;
+    private final com.holidayseasons.event.VillageObjectives objectives;
+    private final com.holidayseasons.event.GraveyardHaunting haunting;
+    private final com.holidayseasons.home.PartyService parties;
 
     private EverFestServer(MinecraftServer server) {
         this.server = server;
@@ -47,6 +51,26 @@ public final class EverFestServer {
         this.easter = new com.holidayseasons.event.EasterService(this);
         this.shows = new com.holidayseasons.event.FireworkShowService(server, this);
         this.wildlife = new com.holidayseasons.entity.WildlifeSpawner(this);
+        this.merchants = new com.holidayseasons.economy.MerchantService(this);
+        this.objectives = new com.holidayseasons.event.VillageObjectives(this);
+        this.haunting = new com.holidayseasons.event.GraveyardHaunting(this);
+        this.parties = new com.holidayseasons.home.PartyService(this);
+    }
+
+    public com.holidayseasons.event.VillageObjectives objectives() {
+        return objectives;
+    }
+
+    public com.holidayseasons.event.GraveyardHaunting haunting() {
+        return haunting;
+    }
+
+    public com.holidayseasons.home.PartyService parties() {
+        return parties;
+    }
+
+    public com.holidayseasons.economy.MerchantService merchants() {
+        return merchants;
     }
 
     public com.holidayseasons.entity.WildlifeSpawner wildlife() {
@@ -144,5 +168,9 @@ public final class EverFestServer {
         gifts.tick();
         shows.tick();
         wildlife.tick();
+        merchants.tick();
+        objectives.tick();
+        haunting.tick();
+        parties.tick();
     }
 }

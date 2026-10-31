@@ -168,6 +168,7 @@ public final class GiftService {
         boolean firstThisYear = claims.claim("gift|" + occ + "|" + player.getUUID() + "|" + v.getUUID());
         if (firstThisYear) {
             for (int i = 0; i <= liked; i++) services.reputation().add(player.getUUID(), village, ReputationMath.Action.GAVE_PRESENT, day);
+            if (liked > 0) com.holidayseasons.economy.HolidayTokens.award(player, 1, "holidayseasons.tokens.reason.present");
         }
         level.sendParticles(liked == 2 ? ParticleTypes.HEART : ParticleTypes.HAPPY_VILLAGER, v.getX(), v.getY() + v.getBbHeight() + 0.3, v.getZ(),
                 liked == 2 ? 6 : 4, 0.4, 0.3, 0.4, 0.02);

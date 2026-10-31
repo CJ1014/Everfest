@@ -100,6 +100,9 @@ public final class EverFestItems {
     public static final DeferredItem<Item> HARVEST_PIE = ITEMS.register("harvest_pie", () -> new Item(new Item.Properties()
             .food(new FoodProperties.Builder().nutrition(10).saturationModifier(0.7f).build())));
 
+    public static final DeferredItem<Item> HOLIDAY_TOKEN = ITEMS.registerSimpleItem("holiday_token", new Item.Properties().rarity(Rarity.UNCOMMON));
+    public static final DeferredItem<BlockItem> SNOW_GLOBE = ITEMS.registerSimpleBlockItem("snow_globe", EverFestBlocks.SNOW_GLOBE,
+            new Item.Properties().rarity(Rarity.RARE).stacksTo(16));
     public static final DeferredItem<Item> RAW_TURKEY = ITEMS.register("raw_turkey", () -> new Item(new Item.Properties()
             .food(new FoodProperties.Builder().nutrition(3).saturationModifier(0.3f).build())));
     public static final DeferredItem<Item> ROAST_TURKEY = ITEMS.register("roast_turkey", () -> new Item(new Item.Properties()
@@ -112,6 +115,8 @@ public final class EverFestItems {
             () -> new DeferredSpawnEggItem(EverFestEntities.GOURDLING, 0xE07B1A, 0x3A6B1F, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> SCARECROW_SPAWN_EGG = ITEMS.register("scarecrow_spawn_egg",
             () -> new DeferredSpawnEggItem(EverFestEntities.SCARECROW, 0xD9B44A, 0x6B4F2A, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> HOLIDAY_MERCHANT_SPAWN_EGG = ITEMS.register("holiday_merchant_spawn_egg",
+            () -> new DeferredSpawnEggItem(EverFestEntities.HOLIDAY_MERCHANT, 0xB8322A, 0xF4EBD0, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> REINDEER_SPAWN_EGG = ITEMS.register("reindeer_spawn_egg",
             () -> new DeferredSpawnEggItem(EverFestEntities.REINDEER, 0x7A5634, 0xE9E1D2, new Item.Properties()));
     public static final DeferredItem<DeferredSpawnEggItem> SPRING_BUNNY_SPAWN_EGG = ITEMS.register("spring_bunny_spawn_egg",

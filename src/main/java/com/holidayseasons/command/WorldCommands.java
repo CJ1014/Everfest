@@ -26,6 +26,54 @@ final class WorldCommands {
             spawn.then(Commands.literal(s.id).executes(ctx -> spawnNow(ctx, s)));
         }
         root.then(wildlife.then(spawn));
+        root.then(Commands.literal("merchant").requires(s -> s.hasPermission(EverFestCommands.ADMIN_LEVEL))
+                .then(Commands.literal("visit").executes(WorldCommands::merchantVisit))
+                .then(Commands.literal("peddler").executes(WorldCommands::peddler)));
+    }
+
+    private static com.holidayseasons.ai.CelebrationDirector.Festival activeFestival(CommandSourceStack src) {
+        var f = EverFestServer.require().director().festival();
+        if (f == null || f.phase() != com.holidayseasons.holiday.HolidayPhase.ACTIVE) {
+            src.sendFailure(Component.literal("No holiday is being celebrated right now"));
+            return null;
+        }
+        return f;
+    }
+
+    private static int merchantVisit(CommandContext<CommandSourceStack> ctx) {
+        CommandSourceStack src = ctx.getSource();
+        var f = activeFestival(src);
+        if (f == null) return 0;
+        EverFestServer s = EverFestServer.require();
+        BlockPos at = BlockPos.containing(src.getPosition());
+        com.holidayseasons.village.VillageRecord nearest = null;
+        for (var r : s.director().villages().all()) {
+            if (nearest == null || r.centre().distSqr(at) < nearest.centre().distSqr(at)) nearest = r;
+        }
+        if (nearest == null) {
+            src.sendFailure(Component.literal("No known village"));
+            return 0;
+        }
+        var m = s.merchants().visitVillage(src.getLevel(), f, nearest, true);
+        if (m == null) {
+            src.sendFailure(Component.literal("No merchant could come (one is already there, one came today, no player nearby, or no room)"));
+            return 0;
+        }
+        src.sendSuccess(() -> Component.literal("A " + f.holiday().id() + " merchant arrived at " + m.blockPosition().toShortString()), true);
+        return 1;
+    }
+
+    private static int peddler(CommandContext<CommandSourceStack> ctx) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        CommandSourceStack src = ctx.getSource();
+        var f = activeFestival(src);
+        if (f == null) return 0;
+        var m = EverFestServer.require().merchants().peddlerVisits(src.getLevel(), f, src.getPlayerOrException(), true);
+        if (m == null) {
+            src.sendFailure(Component.literal("The peddler cannot come (already visited you this Halloween, or no room)"));
+            return 0;
+        }
+        src.sendSuccess(() -> Component.literal("The Midnight Peddler appeared at " + m.blockPosition().toShortString()), true);
+        return 1;
     }
 
     private static int wildlifeStatus(CommandContext<CommandSourceStack> ctx) {

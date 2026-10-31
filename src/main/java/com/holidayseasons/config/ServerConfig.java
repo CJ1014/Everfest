@@ -85,6 +85,20 @@ public final class ServerConfig {
     public final ModConfigSpec.IntValue seasonalSpawnIntervalTicks;
     public final ModConfigSpec.DoubleValue seasonalSpawnChance;
     public final ModConfigSpec.IntValue maxSeasonalAnimalsNearPlayer;
+    // economy and rare events
+    public final ModConfigSpec.BooleanValue holidayTokens;
+    public final ModConfigSpec.BooleanValue holidayMerchants;
+    public final ModConfigSpec.DoubleValue merchantVisitChance;
+    public final ModConfigSpec.IntValue merchantStayTicks;
+    public final ModConfigSpec.BooleanValue midnightPeddler;
+    public final ModConfigSpec.DoubleValue midnightPeddlerChance;
+    public final ModConfigSpec.BooleanValue villageObjectives;
+    public final ModConfigSpec.BooleanValue graveyardHaunting;
+    public final ModConfigSpec.BooleanValue festivalMarkets;
+    public final ModConfigSpec.BooleanValue hearthParties;
+    public final ModConfigSpec.IntValue maxPartyGuests;
+    public final ModConfigSpec.IntValue partyInviteRadius;
+    public final ModConfigSpec.IntValue partyDurationTicks;
     // worldgen
     public final ModConfigSpec.BooleanValue hauntedCottages;
     public final ModConfigSpec.BooleanValue forgottenGraveyards;
@@ -278,6 +292,44 @@ public final class ServerConfig {
                 .translation(wg + "forgottenGraveyards").define("forgottenGraveyards", true);
         seasonalCabins = b.comment("Snowy seasonal cabins with a hearth a player can claim as a home.")
                 .translation(wg + "seasonalCabins").define("seasonalCabins", true);
+        b.pop();
+
+        b.comment("Emeralds stay the main currency. Holiday merchants sell a few limited-use goods and never buy anything back.").push("economy");
+        String ec = "holidayseasons.configuration.economy.";
+        holidayTokens = b.comment("Festival tokens: earned through community activities, spent on token-only collectibles.")
+                .translation(ec + "holidayTokens").define("holidayTokens", false);
+        holidayMerchants = b.comment("Holiday merchants visit celebrating villages while a player is nearby.")
+                .translation(ec + "holidayMerchants").define("holidayMerchants", true);
+        merchantVisitChance = b.comment("Chance that a merchant visits a celebrating village on a given holiday day.")
+                .translation(ec + "merchantVisitChance").defineInRange("merchantVisitChance", 0.6, 0.0, 1.0);
+        merchantStayTicks = b.comment("How long a merchant stays (ticks) unless the holiday ends first.")
+                .translation(ec + "merchantStayTicks").defineInRange("merchantStayTicks", 12000, 1200, 48000);
+        b.pop();
+
+        b.comment("Rare events.").push("events");
+        String ev = "holidayseasons.configuration.events.";
+        midnightPeddler = b.comment("The Midnight Peddler may visit players outdoors on Halloween night (once per player per Halloween).")
+                .translation(ev + "midnightPeddler").define("midnightPeddler", true);
+        midnightPeddlerChance = b.comment("Chance per Halloween night that the peddler visits a player.")
+                .translation(ev + "midnightPeddlerChance").defineInRange("midnightPeddlerChance", 0.35, 0.0, 1.0);
+        villageObjectives = b.comment("Villages ask for a batch of festive goods at their bell during each holiday; contributors are rewarded.")
+                .translation(ev + "villageObjectives").define("villageObjectives", true);
+        graveyardHaunting = b.comment("On Halloween night, ghosts rise from forgotten graveyards when a player walks in (once per night).")
+                .translation(ev + "graveyardHaunting").define("graveyardHaunting", true);
+        festivalMarkets = b.comment("A visiting merchant sets up a temporary market stall (display entities only, removed after the holiday).")
+                .translation(ev + "festivalMarkets").define("festivalMarkets", true);
+        b.pop();
+
+        b.comment("Holiday parties hosted from a Holiday Hearth.").push("parties");
+        String pa = "holidayseasons.configuration.parties.";
+        hearthParties = b.comment("Players can host a party at their home while a holiday is being celebrated.")
+                .translation(pa + "hearthParties").define("hearthParties", true);
+        maxPartyGuests = b.comment("Most villagers invited to one party.")
+                .translation(pa + "maxPartyGuests").defineInRange("maxPartyGuests", 6, 0, 16);
+        partyInviteRadius = b.comment("Villagers within this many blocks of the home are invited (they walk; nobody is teleported).")
+                .translation(pa + "partyInviteRadius").defineInRange("partyInviteRadius", 48, 8, 96);
+        partyDurationTicks = b.comment("How long a party lasts (ticks).")
+                .translation(pa + "partyDurationTicks").defineInRange("partyDurationTicks", 4800, 1200, 24000);
         b.pop();
     }
 

@@ -27,6 +27,8 @@ public final class EverFestEntities {
             () -> EntityType.Builder.of(SpringBunnyEntity::new, MobCategory.CREATURE).sized(0.4f, 0.5f).clientTrackingRange(8).build("spring_bunny"));
     public static final DeferredHolder<EntityType<?>, EntityType<WildTurkeyEntity>> WILD_TURKEY = TYPES.register("wild_turkey",
             () -> EntityType.Builder.of(WildTurkeyEntity::new, MobCategory.CREATURE).sized(0.6f, 0.9f).eyeHeight(0.8f).clientTrackingRange(10).build("wild_turkey"));
+    public static final DeferredHolder<EntityType<?>, EntityType<HolidayMerchantEntity>> HOLIDAY_MERCHANT = TYPES.register("holiday_merchant",
+            () -> EntityType.Builder.of(HolidayMerchantEntity::new, MobCategory.CREATURE).sized(0.6f, 1.95f).eyeHeight(1.62f).clientTrackingRange(10).build("holiday_merchant"));
 
     private EverFestEntities() {
     }
@@ -40,6 +42,7 @@ public final class EverFestEntities {
             e.put(REINDEER.get(), ReindeerEntity.createAttributes().build());
             e.put(SPRING_BUNNY.get(), SpringBunnyEntity.createAttributes().build());
             e.put(WILD_TURKEY.get(), WildTurkeyEntity.createAttributes().build());
+            e.put(HOLIDAY_MERCHANT.get(), net.minecraft.world.entity.npc.Villager.createAttributes().build());
         });
         modBus.addListener((RegisterSpawnPlacementsEvent e) -> {
             e.register(REINDEER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,

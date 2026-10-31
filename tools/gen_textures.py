@@ -1360,6 +1360,125 @@ def roast_turkey():
     return from_map(rows, {"R": hexc("b8702a"), "r": hexc("e0a050"), "B": hexc("f0ece0"), "P": hexc("c8ccd4")})
 
 
+
+# ----------------------------------------------------------------------------------------------- merchants
+
+MERCHANT_LOOKS = {
+    #             robe       trim       dark       hood       skin
+    "winter": ("b8322a", "f4f1ea", "3a2618", "b8322a", "c8956c"),
+    "spooky": ("d8701e", "2a1e2e", "2a1e2e", "2a1e2e", "c8956c"),
+    "midnight": ("2a1838", "4a2a5e", "120a18", "1c1026", "6e5040"),
+    "spring": ("8cc084", "f2b8c8", "4e7a48", "8cc084", "d8a47c"),
+    "harvest": ("8a5a2e", "d88a2a", "4a2e16", "8a5a2e", "b8825a"),
+    "celebration": ("2a3a7a", "e0b030", "18204a", "2a3a7a", "c8956c"),
+}
+
+
+def merchant(look):
+    robe, trim, dark, hood, skin = (hexc(c) for c in MERCHANT_LOOKS[look])
+    seed = 700 + _h(look) % 50
+    img = canvas(64, 64)
+    # head 8x10x8 at (0,0) and nose
+    paint_faces(img, 0, 0, 8, 10, 8, {"all": skin}, 0.04, seed)
+    fx, fy, _, _ = box_faces(0, 0, 8, 10, 8)["front"]
+    brow = shade(skin, 0.7)
+    rect(img, fx + 1, fy + 3, fx + 7, fy + 4, brow)
+    for (dx, c) in ((1, hexc("f2f2ea")), (2, hexc("2a3a2a")), (5, hexc("2a3a2a")), (6, hexc("f2f2ea"))):
+        img.putpixel((fx + dx, fy + 4), c)
+    rect(img, fx + 2, fy + 7, fx + 6, fy + 8, shade(skin, 0.8))
+    if look != "midnight":
+        rect(img, fx + 1, fy + 8, fx + 7, fy + 10, hexc("d8d0c0") if look == "winter" else shade(skin, 0.9))  # beard / chin
+    paint_faces(img, 24, 0, 2, 4, 2, {"all": shade(skin, 0.95)}, 0.03, seed + 1)
+    # hood over the head (hat layer at 32,0): a frame around the face, closed elsewhere
+    hf = box_faces(32, 0, 8, 10, 8)
+    for face in ("top", "right", "left", "back"):
+        noise_fill(img, hf[face], hood, 0.06, seed + 2 + _h(face) % 9)
+    x0, y0, x1, y1 = hf["front"]
+    rect(img, x0, y0, x1, y0 + 2, hood)
+    rect(img, x0, y0, x0 + 1, y1, hood)
+    rect(img, x1 - 1, y0, x1, y1, hood)
+    rect(img, x0, y0 + 2, x1, y0 + 3, trim)
+    for face in ("right", "left"):
+        a, b, c, d = hf[face]
+        rect(img, a, d - 1, c, d, trim)
+    # body and robe (jacket at 0,38)
+    paint_faces(img, 16, 20, 8, 12, 6, {"all": robe}, 0.05, seed + 3)
+    jf = box_faces(0, 38, 8, 20, 6)
+    for face, box in jf.items():
+        noise_fill(img, box, robe, 0.06, seed + 4 + _h(face) % 9)
+    for face in ("right", "front", "left", "back"):
+        a, b, c, d = jf[face]
+        rect(img, a, d - 2, c, d, trim)          # hem
+        rect(img, a, b + 7, c, b + 8, dark)       # belt
+    a, b, c, d = jf["front"]
+    rect(img, a + 3, b, a + 5, d - 2, trim)       # front opening
+    img.putpixel((a + 4, b + 7), hexc("e0c050"))  # buckle
+    # sleeves and hands (arms at 44,22; folded arms at 40,38)
+    af = box_faces(44, 22, 4, 8, 4)
+    for face, box in af.items():
+        noise_fill(img, box, skin if face == "bottom" else robe, 0.05, seed + 5)
+    for face in ("right", "front", "left", "back"):
+        a, b, c, d = af[face]
+        rect(img, a, d - 2, c, d, trim)
+    mf = box_faces(40, 38, 8, 4, 4)
+    for face, box in mf.items():
+        noise_fill(img, box, skin if face in ("front", "top") else robe, 0.05, seed + 6)
+    # legs (mostly hidden by the robe)
+    paint_faces(img, 0, 22, 4, 12, 4, {"all": hexc("3a2e2a"), "bottom": hexc("221a16")}, 0.05, seed + 7)
+    if look == "spooky":
+        for face in ("right", "front", "left", "back"):
+            a, b, c, d = jf[face]
+            for y in range(b + 10, d - 2, 3):
+                rect(img, a, y, c, y + 1, dark)
+    if look == "celebration":
+        dots(img, jf["front"], [trim], 6, seed + 8)
+        dots(img, jf["back"], [trim], 6, seed + 9)
+    return img
+
+
+for _look in MERCHANT_LOOKS:
+    texture(f"entity/merchant/{_look}.png")(lambda l=_look: merchant(l))
+
+
+@texture("entity/merchant/midnight_eyes.png")
+def midnight_eyes():
+    img = canvas(64, 64)
+    fx, fy, _, _ = box_faces(0, 0, 8, 10, 8)["front"]
+    for dx in (1, 2, 5, 6):
+        img.putpixel((fx + dx, fy + 4), hexc("ffb23a"))
+    return img
+
+
+@texture("item/holiday_token.png")
+def holiday_token():
+    rows = [
+        "................",
+        "................",
+        ".....GGGGGG.....",
+        "....GgggggGG....",
+        "...GgYYYYYYgG...",
+        "..GgYYYsYYYYgG..",
+        "..GgYYsssYYYgG..",
+        "..GgYsssssYYgG..",
+        "..GgYYsssYYYgG..",
+        "..GgYYsYsYYYgG..",
+        "..GgYYYYYYYYgG..",
+        "...GgYYYYYYgGd..",
+        "....GGggggGGd...",
+        ".....dGGGGdd....",
+        "................",
+        "................",
+    ]
+    return from_map(rows, {"G": hexc("b8860b"), "g": hexc("e8c040"), "Y": hexc("f4d860"), "s": hexc("fff6c0"), "d": hexc("7a5a10")})
+
+
+@texture("block/snow_globe_tree.png")
+def snow_globe_tree():
+    img = flat(hexc("2f6b3a"), 880, 0.12)()
+    dots(img, (0, 0, 16, 16), [hexc("f4f8ff"), hexc("dfe8f4")], 22, 881)
+    return img
+
+
 def main():
     only = set(sys.argv[1:])
     for path, fn in TEXTURES.items():

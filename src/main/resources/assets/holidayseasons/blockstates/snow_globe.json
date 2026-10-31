@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "holidayseasons:block/snow_globe"
+    },
+    "facing=east": {
+      "model": "holidayseasons:block/snow_globe",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "holidayseasons:block/snow_globe",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "holidayseasons:block/snow_globe",
+      "y": 270
+    }
+  }
+}

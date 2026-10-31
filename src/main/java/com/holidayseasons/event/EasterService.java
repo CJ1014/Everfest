@@ -117,6 +117,7 @@ public final class EasterService {
                 services.reputation().add(player.getUUID(), village, ReputationMath.Action.FESTIVAL_PARTICIPATION, services.calendar().snapshot().epochDay());
             }
             if (colour == -1) player.displayClientMessage(Component.translatable("holidayseasons.easter.golden"), false);
+            com.holidayseasons.economy.HolidayTokens.award(player, 1, "holidayseasons.tokens.reason.egg");
         }
         return egg;
     }

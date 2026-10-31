@@ -25,7 +25,9 @@ public enum TaskType {
     /** Adults: hide eggs before Easter. */
     HIDE_EGGS("hide_eggs", true, true),
     /** Visit a registered player home. */
-    VISIT_HOME("visit_homes", false, false);
+    VISIT_HOME("visit_homes", false, false),
+    /** A guest at a party a player hosts at their home (only ever given by invitation, never picked by holidays). */
+    PARTY_GUEST("hearth_party_invitation", false, false);
 
     private final String behavior;
     private final boolean adultsOnly;

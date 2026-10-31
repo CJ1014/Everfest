@@ -59,6 +59,8 @@ public final class EverFest {
             e.register(com.holidayseasons.gametest.SpringGameTests.class);
             e.register(com.holidayseasons.gametest.WildlifeGameTests.class);
             e.register(com.holidayseasons.gametest.WorldGameTests.class);
+            e.register(com.holidayseasons.gametest.EconomyGameTests.class);
+            e.register(com.holidayseasons.gametest.FestivalGameTests.class);
         });
 
         NeoForge.EVENT_BUS.addListener(this::onServerStarted);
@@ -78,6 +80,7 @@ public final class EverFest {
         NeoForge.EVENT_BUS.addListener(this::onEntityJoin);
         NeoForge.EVENT_BUS.addListener(this::onEntityInteract);
         NeoForge.EVENT_BUS.addListener(this::onBlockBreak);
+        NeoForge.EVENT_BUS.addListener(this::onUseBlock);
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent e) -> {
             EverFestServer s = EverFestServer.get();
             if (s != null && !e.getLevel().isClientSide() && e.getEntity() instanceof net.minecraft.world.entity.npc.Villager v) {
@@ -165,6 +168,18 @@ public final class EverFest {
         }
         if (!child.isBaby() || !held.is(com.holidayseasons.item.EverFestItems.CANDY_TAG)) return;
         if (s != null && s.halloween().playerGivesCandy(event.getEntity(), child, event.getItemStack())) {
+            event.setCanceled(true);
+            event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+        }
+    }
+
+    /** Village objectives: festive goods are handed in by using them on the village bell. */
+    private void onUseBlock(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
+        if (event.getLevel().isClientSide() || event.getItemStack().isEmpty()) return;
+        if (!event.getLevel().getBlockState(event.getPos()).is(net.minecraft.world.level.block.Blocks.BELL)) return;
+        EverFestServer s = EverFestServer.get();
+        if (s == null || !(event.getLevel() instanceof net.minecraft.server.level.ServerLevel level)) return;
+        if (s.objectives().contribute(level, event.getEntity(), event.getPos(), event.getItemStack()) > 0) {
             event.setCanceled(true);
             event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
         }
