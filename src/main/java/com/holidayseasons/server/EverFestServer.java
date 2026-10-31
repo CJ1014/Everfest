@@ -38,6 +38,7 @@ public final class EverFestServer {
     private final com.holidayseasons.event.VillageObjectives objectives;
     private final com.holidayseasons.event.GraveyardHaunting haunting;
     private final com.holidayseasons.home.PartyService parties;
+    private final com.holidayseasons.reputation.CollectionService collection;
 
     private EverFestServer(MinecraftServer server) {
         this.server = server;
@@ -55,6 +56,7 @@ public final class EverFestServer {
         this.objectives = new com.holidayseasons.event.VillageObjectives(this);
         this.haunting = new com.holidayseasons.event.GraveyardHaunting(this);
         this.parties = new com.holidayseasons.home.PartyService(this);
+        this.collection = new com.holidayseasons.reputation.CollectionService(this);
     }
 
     public com.holidayseasons.event.VillageObjectives objectives() {
@@ -63,6 +65,10 @@ public final class EverFestServer {
 
     public com.holidayseasons.event.GraveyardHaunting haunting() {
         return haunting;
+    }
+
+    public com.holidayseasons.reputation.CollectionService collection() {
+        return collection;
     }
 
     public com.holidayseasons.home.PartyService parties() {
@@ -172,5 +178,6 @@ public final class EverFestServer {
         objectives.tick();
         haunting.tick();
         parties.tick();
+        collection.tick();
     }
 }

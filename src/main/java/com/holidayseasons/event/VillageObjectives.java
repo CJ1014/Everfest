@@ -182,6 +182,8 @@ public final class VillageObjectives {
             if (player != null) {
                 player.sendSystemMessage(Component.translatable("holidayseasons.objective.complete", describe(p)));
                 HolidayTokens.award(player, 3, "holidayseasons.tokens.reason.objective");
+                services.collection().count(player, "objectives_completed", 1);
+                com.holidayseasons.reputation.EverFestAdvancements.award(player, com.holidayseasons.reputation.EverFestAdvancements.COMMUNITY);
             }
         }
         for (int i = 0; i < 4; i++) {

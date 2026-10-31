@@ -106,6 +106,7 @@ public class HolidayHearthBlock extends BaseEntityBlock {
         boolean hasDoor = !home.entrance().equals(pos);
         player.displayClientMessage(Component.translatable(hasDoor ? "holidayseasons.home.registered" : "holidayseasons.home.registered_no_door",
                 home.name(), home.entrance().toShortString()), false);
+        com.holidayseasons.reputation.EverFestAdvancements.award(player, com.holidayseasons.reputation.EverFestAdvancements.HOME_SWEET_HOME);
     }
 
     /**
@@ -127,6 +128,7 @@ public class HolidayHearthBlock extends BaseEntityBlock {
         boolean hasDoor = !home.entrance().equals(pos);
         player.displayClientMessage(Component.translatable(hasDoor ? "holidayseasons.home.registered" : "holidayseasons.home.registered_no_door",
                 home.name(), home.entrance().toShortString()), false);
+        com.holidayseasons.reputation.EverFestAdvancements.award(player, com.holidayseasons.reputation.EverFestAdvancements.HOME_SWEET_HOME);
     }
 
     @Override

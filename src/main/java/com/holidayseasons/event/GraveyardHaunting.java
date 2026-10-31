@@ -80,6 +80,8 @@ public final class GraveyardHaunting {
         }
         if (risen > 0) services.gifts().claims().claim(claim);
         if (risen > 0 && player != null) {
+            services.collection().encounter(player, "graveyard_haunting");
+            com.holidayseasons.reputation.EverFestAdvancements.award(player, com.holidayseasons.reputation.EverFestAdvancements.RESTLESS_GRAVES);
             player.displayClientMessage(Component.translatable("holidayseasons.graveyard.stirs"), false);
             player.playNotifySound(EverFestSounds.GHOST_MOAN.get(), SoundSource.HOSTILE, 1f, 0.8f);
             EverFest.LOGGER.info("EverFest: {} ghosts rose in a graveyard near {}", risen, player.getGameProfile().getName());

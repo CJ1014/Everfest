@@ -177,6 +177,15 @@ public class HolidayMerchantEntity extends WanderingTrader {
         discard();
     }
 
+    @Override
+    public void setTradingPlayer(@org.jetbrains.annotations.Nullable Player player) {
+        super.setTradingPlayer(player);
+        EverFestServer s = EverFestServer.get();
+        if (player != null && !level().isClientSide && s != null) {
+            s.collection().encounter(player, look() == Look.MIDNIGHT ? "midnight_peddler" : "holiday_merchant");
+        }
+    }
+
     /** Merchants stay near the village square (or where the peddler appeared). */
     public void settleAround(BlockPos centre, int radius) {
         restrictTo(centre, radius);

@@ -1,0 +1,28 @@
+{
+  "parent": "holidayseasons:everfest/root",
+  "display": {
+    "icon": {
+      "id": "minecraft:firework_rocket"
+    },
+    "title": {
+      "translate": "advancements.holidayseasons.happy_new_year.title"
+    },
+    "description": {
+      "translate": "advancements.holidayseasons.happy_new_year.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

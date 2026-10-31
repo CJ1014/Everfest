@@ -1,0 +1,28 @@
+{
+  "parent": "holidayseasons:everfest/trick_or_treat",
+  "display": {
+    "icon": {
+      "id": "minecraft:soul_lantern"
+    },
+    "title": {
+      "translate": "advancements.holidayseasons.the_peddler.title"
+    },
+    "description": {
+      "translate": "advancements.holidayseasons.the_peddler.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

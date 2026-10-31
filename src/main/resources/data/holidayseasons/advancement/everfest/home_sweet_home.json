@@ -1,0 +1,28 @@
+{
+  "parent": "holidayseasons:everfest/root",
+  "display": {
+    "icon": {
+      "id": "holidayseasons:holiday_hearth"
+    },
+    "title": {
+      "translate": "advancements.holidayseasons.home_sweet_home.title"
+    },
+    "description": {
+      "translate": "advancements.holidayseasons.home_sweet_home.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "parent": "holidayseasons:everfest/root",
+  "display": {
+    "icon": {
+      "id": "holidayseasons:collection_book"
+    },
+    "title": {
+      "translate": "advancements.holidayseasons.a_new_chapter.title"
+    },
+    "description": {
+      "translate": "advancements.holidayseasons.a_new_chapter.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "holidayseasons:collection_book"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

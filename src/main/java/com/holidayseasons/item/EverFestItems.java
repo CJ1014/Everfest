@@ -100,6 +100,8 @@ public final class EverFestItems {
     public static final DeferredItem<Item> HARVEST_PIE = ITEMS.register("harvest_pie", () -> new Item(new Item.Properties()
             .food(new FoodProperties.Builder().nutrition(10).saturationModifier(0.7f).build())));
 
+    public static final DeferredItem<CollectionBookItem> COLLECTION_BOOK = ITEMS.register("collection_book",
+            () -> new CollectionBookItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> HOLIDAY_TOKEN = ITEMS.registerSimpleItem("holiday_token", new Item.Properties().rarity(Rarity.UNCOMMON));
     public static final DeferredItem<BlockItem> SNOW_GLOBE = ITEMS.registerSimpleBlockItem("snow_globe", EverFestBlocks.SNOW_GLOBE,
             new Item.Properties().rarity(Rarity.RARE).stacksTo(16));

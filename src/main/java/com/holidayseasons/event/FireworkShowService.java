@@ -69,6 +69,7 @@ public final class FireworkShowService {
         countdown = withCountdown;
         showTicks = 0;
         EverFest.LOGGER.info("EverFest: firework show starting{}", withCountdown ? " with countdown" : "");
+        if (!withCountdown) server.overworld().players().forEach(p -> services.collection().encounter(p, "firework_show"));
     }
 
     private void runShow(ServerLevel level) {
@@ -79,6 +80,10 @@ public final class FireworkShowService {
                 Component title = n > 0 ? Component.literal(Integer.toString(n)).withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD)
                         : Component.translatable("holidayseasons.new_year.happy").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD);
                 for (ServerPlayer p : level.players()) {
+                    if (n == 0) {
+                        services.collection().encounter(p, "firework_show");
+                        com.holidayseasons.reputation.EverFestAdvancements.award(p, com.holidayseasons.reputation.EverFestAdvancements.HAPPY_NEW_YEAR);
+                    }
                     p.connection.send(new ClientboundSetTitlesAnimationPacket(0, n > 0 ? 18 : 80, n > 0 ? 2 : 20));
                     p.connection.send(new ClientboundSetTitleTextPacket(title));
                     p.playNotifySound(n > 0 ? SoundEvents.NOTE_BLOCK_HAT.value() : SoundEvents.PLAYER_LEVELUP, SoundSource.AMBIENT, 1f, n > 0 ? 1f + (10 - n) * 0.05f : 1f);

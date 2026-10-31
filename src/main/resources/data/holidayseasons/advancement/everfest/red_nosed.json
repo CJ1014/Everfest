@@ -1,0 +1,28 @@
+{
+  "parent": "holidayseasons:everfest/root",
+  "display": {
+    "icon": {
+      "id": "holidayseasons:reindeer_spawn_egg"
+    },
+    "title": {
+      "translate": "advancements.holidayseasons.red_nosed.title"
+    },
+    "description": {
+      "translate": "advancements.holidayseasons.red_nosed.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "parent": "holidayseasons:everfest/egg_hunter",
+  "display": {
+    "icon": {
+      "id": "holidayseasons:golden_egg"
+    },
+    "title": {
+      "translate": "advancements.holidayseasons.golden_find.title"
+    },
+    "description": {
+      "translate": "advancements.holidayseasons.golden_find.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "holidayseasons:golden_egg"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

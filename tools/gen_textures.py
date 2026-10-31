@@ -1506,6 +1506,31 @@ for _i in range(4):
     texture(f"particle/autumn_leaf_{_i}.png")(lambda i=_i: autumn_leaf(i))
 
 
+
+@texture("item/collection_book.png")
+def collection_book():
+    rows = [
+        "................",
+        "...KKKKKKKKKK...",
+        "..KRRRRRRRRRRK..",
+        "..KRRGGGGGGRRK..",
+        "..KRGRRRRRRGRKP.",
+        "..KRGRRYYRRGRKP.",
+        "..KRGRYOOYRGRKP.",
+        "..KRGRRYYRRGRKP.",
+        "..KRGRRRRRRGRKP.",
+        "..KRRGGGGGGRRKP.",
+        "..KRRRRRRRRRRKP.",
+        "..KRRRRRRRRRRKP.",
+        "..KrrrrrrrrrrKP.",
+        "...KKKKKKKKKKPP.",
+        "....PPPPPPPPPP..",
+        "................",
+    ]
+    return from_map(rows, {"K": hexc("3b1a12"), "R": hexc("a8322a"), "r": hexc("7e2219"), "G": hexc("d4af37"),
+                           "Y": hexc("f4d860"), "O": hexc("e07b1a"), "P": hexc("f4ebd0")})
+
+
 def main():
     only = set(sys.argv[1:])
     for path, fn in TEXTURES.items():

@@ -229,6 +229,7 @@ public final class HalloweenService {
         ServerPlayer owner = server.getPlayerList().getPlayer(home.owner);
         if (owner == null || owner.level() != level || owner.blockPosition().distSqr(d.entrance()) > 48 * 48) return false;
         owner.displayClientMessage(Component.translatable("holidayseasons.trick_or_treat.at_door", group.size(), home.name()), false);
+        services.collection().encounter(owner, "trick_or_treaters");
         return true;
     }
 
@@ -355,6 +356,8 @@ public final class HalloweenService {
                 }
             }
         }
+        services.collection().count(player, "candy_given", 1);
+        com.holidayseasons.reputation.EverFestAdvancements.award(player, com.holidayseasons.reputation.EverFestAdvancements.TRICK_OR_TREAT);
         return true;
     }
 

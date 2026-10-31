@@ -118,6 +118,7 @@ public final class EasterService {
             }
             if (colour == -1) player.displayClientMessage(Component.translatable("holidayseasons.easter.golden"), false);
             com.holidayseasons.economy.HolidayTokens.award(player, 1, "holidayseasons.tokens.reason.egg");
+            services.collection().count(player, "eggs_found", 1);
         }
         return egg;
     }

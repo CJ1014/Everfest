@@ -700,6 +700,92 @@ def music_and_particles():
     update_lang({f"{NS}.configuration.holidayMusic": "Holiday Music"})
 
 
+ADVANCEMENTS = [
+    # id, parent, icon, frame, trigger (None = granted by code)
+    ("home_sweet_home", "root", "holidayseasons:holiday_hearth", "task", None),
+    ("life_of_the_party", "home_sweet_home", "minecraft:cake", "goal", None),
+    ("trick_or_treat", "root", "holidayseasons:candy_corn", "task", None),
+    ("the_peddler", "trick_or_treat", "minecraft:soul_lantern", "goal", None),
+    ("restless_graves", "the_peddler", "holidayseasons:tombstone", "goal", None),
+    ("well_chosen", "root", "holidayseasons:present", "task", None),
+    ("egg_hunter", "root", "holidayseasons:easter_egg_pink", "task", None),
+    ("golden_find", "egg_hunter", "holidayseasons:golden_egg", "goal", "holidayseasons:golden_egg"),
+    ("happy_new_year", "root", "minecraft:firework_rocket", "task", None),
+    ("pillar_of_the_community", "root", "minecraft:bell", "task", None),
+    ("local_legend", "pillar_of_the_community", "minecraft:emerald", "challenge", None),
+    ("red_nosed", "root", "holidayseasons:reindeer_spawn_egg", "goal", None),
+    ("a_new_chapter", "root", "holidayseasons:collection_book", "task", "holidayseasons:collection_book"),
+    ("collector", "a_new_chapter", "holidayseasons:snow_globe", "challenge", None),
+    ("a_year_of_festivals", "a_new_chapter", "holidayseasons:wall_calendar", "challenge", None),
+]
+ADV_TEXT = {
+    "root": ("EverFest", "Celebrate the holidays with the villagers"),
+    "home_sweet_home": ("Home Sweet Home", "Make a house your home with a Holiday Hearth"),
+    "life_of_the_party": ("Life of the Party", "Host a holiday party that at least three villagers come to"),
+    "trick_or_treat": ("Trick or Treat!", "Give candy to a child out trick-or-treating"),
+    "the_peddler": ("Strange Wares", "Meet the Midnight Peddler on Halloween night"),
+    "restless_graves": ("Restless Graves", "Wake the ghosts of a forgotten graveyard on Halloween night"),
+    "well_chosen": ("Just What I Wished For", "Give a villager the present they wished for"),
+    "egg_hunter": ("Egg Hunter", "Find 10 hidden Easter eggs"),
+    "golden_find": ("Golden Find", "Find a Golden Egg"),
+    "happy_new_year": ("Happy New Year!", "Be there when the countdown reaches midnight"),
+    "pillar_of_the_community": ("Pillar of the Community", "Help a village finish its holiday objective"),
+    "local_legend": ("Local Legend", "Become a Legend in a village"),
+    "red_nosed": ("A Very Shiny Nose", "Spot a festive red-nosed reindeer"),
+    "a_new_chapter": ("A New Chapter", "Get a Holiday Collection Book"),
+    "collector": ("Collector", "Collect every collectible in the Holiday Collection Book"),
+    "a_year_of_festivals": ("A Year of Festivals", "Celebrate every holiday on the calendar"),
+}
+
+
+def progression():
+    simple_item("collection_book")
+    shapeless("collection_book", ["minecraft:book", "minecraft:gold_nugget", "minecraft:red_dye"])
+    base = f"{D}/advancement/everfest"
+    root_text = ADV_TEXT["root"]
+    write(f"{base}/root.json", {"display": {"icon": {"id": t("wall_calendar")}, "title": {"translate": f"advancements.{NS}.root.title"},
+          "description": {"translate": f"advancements.{NS}.root.description"}, "background": "minecraft:textures/block/spruce_planks.png",
+          "show_toast": False, "announce_to_chat": False}, "criteria": {"tick": {"trigger": "minecraft:tick"}}})
+    lang = {f"advancements.{NS}.root.title": root_text[0], f"advancements.{NS}.root.description": root_text[1]}
+    for adv_id, parent, icon, frame, item in ADVANCEMENTS:
+        if item is None:
+            criteria = {"done": {"trigger": "minecraft:impossible"}}
+        else:
+            criteria = {"done": {"trigger": "minecraft:inventory_changed", "conditions": {"items": [{"items": item}]}}}
+        write(f"{base}/{adv_id}.json", {"parent": f"{NS}:everfest/{parent}", "display": {"icon": {"id": icon},
+              "title": {"translate": f"advancements.{NS}.{adv_id}.title"}, "description": {"translate": f"advancements.{NS}.{adv_id}.description"},
+              "frame": frame, "show_toast": True, "announce_to_chat": True, "hidden": False},
+              "criteria": criteria, "requirements": [["done"]]})
+        lang[f"advancements.{NS}.{adv_id}.title"] = ADV_TEXT[adv_id][0]
+        lang[f"advancements.{NS}.{adv_id}.description"] = ADV_TEXT[adv_id][1]
+    c = f"{NS}.collection"
+    lang.update({
+        f"item.{NS}.collection_book": "Holiday Collection Book",
+        f"{c}.title": "Holiday Collection Book", f"{c}.complete": "%s%% complete",
+        f"{c}.tab.holidays": "Holidays", f"{c}.tab.collectibles": "Collection", f"{c}.tab.wildlife": "Wildlife",
+        f"{c}.tab.achievements": "Feats", f"{c}.tab.encounters": "Encounters",
+        f"{c}.celebrated": "%s: celebrated %s time(s) (year %s)", f"{c}.not_yet": "%s: not celebrated yet",
+        f"{c}.section.decorations": "Decorations", f"{c}.section.costumes": "Costumes and hats",
+        f"{c}.section.treats": "Treats", f"{c}.section.rare": "Rare finds",
+        f"{c}.unknown_item": "???", f"{c}.not_found": "Not found yet", f"{c}.undiscovered": "Not discovered yet",
+        f"{c}.new_entry": "New in your Collection Book: %s",
+        f"{c}.wildlife.reindeer.brown": "Reindeer (brown)", f"{c}.wildlife.reindeer.frosty": "Reindeer (frosty)",
+        f"{c}.wildlife.reindeer.festive": "Red-nosed reindeer", f"{c}.wildlife.spring_bunny.cream": "Spring bunny (cream)",
+        f"{c}.wildlife.spring_bunny.blush": "Spring bunny (blush)", f"{c}.wildlife.spring_bunny.sky": "Spring bunny (sky)",
+        f"{c}.wildlife.spring_bunny.lilac": "Spring bunny (lilac)", f"{c}.wildlife.wild_turkey": "Wild turkey",
+        f"{c}.encounter.holiday_merchant": "Traded with a holiday merchant", f"{c}.encounter.midnight_peddler": "Met the Midnight Peddler",
+        f"{c}.encounter.graveyard_haunting": "Woke a haunted graveyard", f"{c}.encounter.mysterious_gift": "Received a mysterious gift",
+        f"{c}.encounter.firework_show": "Watched a holiday firework show", f"{c}.encounter.trick_or_treaters": "Trick-or-treaters at your door",
+        f"{c}.encounter.hearth_party": "Hosted a hearth party",
+        f"{c}.achievement.eggs_found": "Hidden eggs found: %s/%s", f"{c}.achievement.candy_given": "Candy given to children: %s/%s",
+        f"{c}.achievement.presents_given": "Presents given to villagers: %s/%s",
+        f"{c}.achievement.objectives_completed": "Village objectives helped: %s/%s",
+        f"{c}.achievement.parties_hosted": "Parties hosted: %s/%s", f"{c}.achievement.guests_welcomed": "Party guests welcomed: %s/%s",
+        f"{c}.totals": "All time: %s eggs, %s candy, %s presents, %s guests",
+    })
+    update_lang(lang)
+
+
 if __name__ == "__main__":
     items()
     blocks()
@@ -714,4 +800,5 @@ if __name__ == "__main__":
     economy()
     events_and_parties()
     music_and_particles()
+    progression()
     print("assets generated")

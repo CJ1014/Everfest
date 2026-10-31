@@ -29,6 +29,10 @@ public final class EverFestCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("everfest");
         root.then(Commands.literal("calendar").executes(EverFestCommands::openCalendar));
+        root.then(Commands.literal("collection").executes(ctx -> {
+            EverFestServer.require().collection().open(ctx.getSource().getPlayerOrException());
+            return 1;
+        }));
         root.then(Commands.literal("date")
                 .executes(EverFestCommands::showDate)
                 .then(Commands.literal("info").executes(EverFestCommands::showInfo))

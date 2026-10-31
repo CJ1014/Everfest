@@ -28,3 +28,4 @@ src/generated/**/.cache
 
 # os
 .DS_Store
+dist/

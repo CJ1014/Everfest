@@ -1,0 +1,28 @@
+{
+  "parent": "holidayseasons:everfest/root",
+  "display": {
+    "icon": {
+      "id": "holidayseasons:easter_egg_pink"
+    },
+    "title": {
+      "translate": "advancements.holidayseasons.egg_hunter.title"
+    },
+    "description": {
+      "translate": "advancements.holidayseasons.egg_hunter.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

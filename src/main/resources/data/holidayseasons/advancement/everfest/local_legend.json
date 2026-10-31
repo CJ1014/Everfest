@@ -1,0 +1,28 @@
+{
+  "parent": "holidayseasons:everfest/pillar_of_the_community",
+  "display": {
+    "icon": {
+      "id": "minecraft:emerald"
+    },
+    "title": {
+      "translate": "advancements.holidayseasons.local_legend.title"
+    },
+    "description": {
+      "translate": "advancements.holidayseasons.local_legend.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

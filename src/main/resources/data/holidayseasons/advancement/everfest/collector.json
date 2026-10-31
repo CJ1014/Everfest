@@ -1,0 +1,28 @@
+{
+  "parent": "holidayseasons:everfest/a_new_chapter",
+  "display": {
+    "icon": {
+      "id": "holidayseasons:snow_globe"
+    },
+    "title": {
+      "translate": "advancements.holidayseasons.collector.title"
+    },
+    "description": {
+      "translate": "advancements.holidayseasons.collector.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

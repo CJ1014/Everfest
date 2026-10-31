@@ -113,6 +113,8 @@ public final class MerchantService {
         if (m == null) return null;
         m.settleAround(at, 6);
         player.displayClientMessage(Component.translatable("holidayseasons.peddler.arrives"), false);
+        services.collection().encounter(player, "midnight_peddler");
+        com.holidayseasons.reputation.EverFestAdvancements.award(player, com.holidayseasons.reputation.EverFestAdvancements.THE_PEDDLER);
         player.playNotifySound(EverFestSounds.DISTANT_BELL.get(), SoundSource.AMBIENT, 0.8f, 0.8f);
         player.playNotifySound(EverFestSounds.WHISPERS.get(), SoundSource.AMBIENT, 0.6f, 1f);
         EverFest.LOGGER.info("EverFest: the Midnight Peddler visits {}", player.getGameProfile().getName());

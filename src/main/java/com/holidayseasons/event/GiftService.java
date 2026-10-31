@@ -169,6 +169,8 @@ public final class GiftService {
         if (firstThisYear) {
             for (int i = 0; i <= liked; i++) services.reputation().add(player.getUUID(), village, ReputationMath.Action.GAVE_PRESENT, day);
             if (liked > 0) com.holidayseasons.economy.HolidayTokens.award(player, 1, "holidayseasons.tokens.reason.present");
+            services.collection().count(player, "presents_given", 1);
+            if (liked == 2) com.holidayseasons.reputation.EverFestAdvancements.award(player, com.holidayseasons.reputation.EverFestAdvancements.WELL_CHOSEN);
         }
         level.sendParticles(liked == 2 ? ParticleTypes.HEART : ParticleTypes.HAPPY_VILLAGER, v.getX(), v.getY() + v.getBbHeight() + 0.3, v.getZ(),
                 liked == 2 ? 6 : 4, 0.4, 0.3, 0.4, 0.02);
@@ -308,5 +310,6 @@ public final class GiftService {
         level.sendParticles(ParticleTypes.END_ROD, at.getX() + 0.5, at.getY() + 1, at.getZ() + 0.5, 30, 0.6, 1.2, 0.6, 0.02);
         level.playSound(null, at, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.AMBIENT, 2f, 1.2f);
         player.displayClientMessage(Component.translatable("holidayseasons.gift.mysterious").withStyle(ChatFormatting.AQUA), false);
+        services.collection().encounter(player, "mysterious_gift");
     }
 }

@@ -140,7 +140,17 @@ public final class PartyService {
             if (p.level.getEntity(e.getKey()) instanceof Villager v) services.director().cancel(v, e.getValue());
         }
         ServerPlayer host = services.server().getPlayerList().getPlayer(p.host);
-        if (host != null) host.displayClientMessage(Component.translatable("holidayseasons.party.over", p.arrived.size(), p.invited.size()), false);
+        if (host != null) {
+            host.displayClientMessage(Component.translatable("holidayseasons.party.over", p.arrived.size(), p.invited.size()), false);
+            if (!p.arrived.isEmpty()) {
+                services.collection().count(host, "parties_hosted", 1);
+                services.collection().count(host, "guests_welcomed", p.arrived.size());
+                services.collection().encounter(host, "hearth_party");
+            }
+            if (p.arrived.size() >= 3) {
+                com.holidayseasons.reputation.EverFestAdvancements.award(host, com.holidayseasons.reputation.EverFestAdvancements.LIFE_OF_THE_PARTY);
+            }
+        }
         if (p.arrived.isEmpty() || !services.gifts().claims().claim("party|" + p.occurrence + "|" + p.host)) return;
         long day = services.calendar().snapshot().epochDay();
         Set<String> villages = new HashSet<>(p.arrived.values());

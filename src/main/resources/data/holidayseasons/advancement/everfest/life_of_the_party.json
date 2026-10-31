@@ -1,0 +1,28 @@
+{
+  "parent": "holidayseasons:everfest/home_sweet_home",
+  "display": {
+    "icon": {
+      "id": "minecraft:cake"
+    },
+    "title": {
+      "translate": "advancements.holidayseasons.life_of_the_party.title"
+    },
+    "description": {
+      "translate": "advancements.holidayseasons.life_of_the_party.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

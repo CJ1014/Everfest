@@ -1,0 +1,28 @@
+{
+  "parent": "holidayseasons:everfest/a_new_chapter",
+  "display": {
+    "icon": {
+      "id": "holidayseasons:wall_calendar"
+    },
+    "title": {
+      "translate": "advancements.holidayseasons.a_year_of_festivals.title"
+    },
+    "description": {
+      "translate": "advancements.holidayseasons.a_year_of_festivals.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

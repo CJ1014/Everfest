@@ -1,0 +1,28 @@
+{
+  "parent": "holidayseasons:everfest/the_peddler",
+  "display": {
+    "icon": {
+      "id": "holidayseasons:tombstone"
+    },
+    "title": {
+      "translate": "advancements.holidayseasons.restless_graves.title"
+    },
+    "description": {
+      "translate": "advancements.holidayseasons.restless_graves.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

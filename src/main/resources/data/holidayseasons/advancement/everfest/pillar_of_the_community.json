@@ -1,0 +1,28 @@
+{
+  "parent": "holidayseasons:everfest/root",
+  "display": {
+    "icon": {
+      "id": "minecraft:bell"
+    },
+    "title": {
+      "translate": "advancements.holidayseasons.pillar_of_the_community.title"
+    },
+    "description": {
+      "translate": "advancements.holidayseasons.pillar_of_the_community.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}
