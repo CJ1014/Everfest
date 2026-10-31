@@ -40,10 +40,15 @@ public final class FixedMonthCalendarSystem implements CalendarSystem {
         this.signature = "fixed[" + j + "]L" + leapInterval + "M" + leapMonth;
     }
 
+    private static final java.util.Map<Long, FixedMonthCalendarSystem> UNIFORM = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** Twelve equal months. Systems are immutable, so they are shared (the calendar asks for one every tick). */
     public static FixedMonthCalendarSystem uniform(int daysPerMonth, int referenceYearBase) {
-        int[] lengths = new int[12];
-        Arrays.fill(lengths, daysPerMonth);
-        return new FixedMonthCalendarSystem(lengths, 0, 2, referenceYearBase);
+        return UNIFORM.computeIfAbsent(((long) daysPerMonth << 32) | (referenceYearBase & 0xFFFFFFFFL), k -> {
+            int[] lengths = new int[12];
+            Arrays.fill(lengths, daysPerMonth);
+            return new FixedMonthCalendarSystem(lengths, 0, 2, referenceYearBase);
+        });
     }
 
     public boolean isLeapYear(int year) {

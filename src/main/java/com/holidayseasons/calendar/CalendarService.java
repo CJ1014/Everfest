@@ -121,7 +121,8 @@ public final class CalendarService {
         CalendarSnapshot next = computeSnapshot(reading.orElse(null), dayTime);
         CalendarSnapshot previous = current;
         current = next;
-        seasonSchedule = reading.map(r -> seasonSnapshot(r, dayTime)).orElse(null);
+        // In season-synced mode the schedule is the snapshot itself; only other modes need a second one.
+        seasonSchedule = reading.map(r -> settings.mode() == CalendarMode.SEASON_SYNCED ? next : seasonSnapshot(r, dayTime)).orElse(null);
 
         boolean dateChanged = previous == null
                 || !previous.date().equals(next.date())
@@ -218,18 +219,31 @@ public final class CalendarService {
         };
     }
 
+    @Nullable
+    private CalendarSnapshot lastSeasonSnapshot;
+
     private CalendarSnapshot seasonSnapshot(SeasonReading r, long dayTime) {
         FixedMonthCalendarSystem system = settings.seasonSystem(r.daysPerSubSeason());
         CalendarDate date = SeasonCycleMapper.dateFor(data.seasonYear, alignedCycle(r, dayTime), r.subSeasonTicks(), r.dayDuration(), system);
+        int timeOfDay = (int) Math.floorMod(dayTime, ClockMath.TICKS_PER_DAY);
+        CalendarSnapshot prev = lastSeasonSnapshot;
+        if (prev != null && prev.date().equals(date) && prev.subSeason() == r.subSeason() && prev.systemSignature().equals(system.signature())) {
+            // Same day as last tick: only the time of day moved on.
+            CalendarSnapshot same = new CalendarSnapshot(CalendarMode.SEASON_SYNCED, prev.systemSignature(), date, prev.epochDay(), timeOfDay,
+                    prev.dayOfWeek(), prev.season(), prev.subSeason(), true, prev.monthLengths());
+            lastSeasonSnapshot = same;
+            return same;
+        }
         long epochDay = system.toEpochDay(date);
         String iso = date.toIsoString();
         if (settings.mode() == CalendarMode.SEASON_SYNCED && !iso.equals(data.lastSyncedDate)) {
             data.lastSyncedDate = iso;
             data.setDirty();
         }
-        return new CalendarSnapshot(CalendarMode.SEASON_SYNCED, system.signature(), date, epochDay,
-                (int) Math.floorMod(dayTime, ClockMath.TICKS_PER_DAY), system.dayOfWeek(epochDay),
+        lastSeasonSnapshot = new CalendarSnapshot(CalendarMode.SEASON_SYNCED, system.signature(), date, epochDay,
+                timeOfDay, system.dayOfWeek(epochDay),
                 r.subSeason().season(), r.subSeason(), true, CalendarSnapshot.monthLengthsOf(system, date.year()));
+        return lastSeasonSnapshot;
     }
 
     private CalendarSnapshot fallbackSnapshot(long dayTime) {

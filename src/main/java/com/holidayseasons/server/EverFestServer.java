@@ -166,18 +166,35 @@ public final class EverFestServer {
         return director.ledger();
     }
 
+    private final TickProfiler profiler = new TickProfiler();
+
+    public TickProfiler profiler() {
+        return profiler;
+    }
+
     public void tick() {
+        profiler.beginTick();
         calendar.tick();
+        profiler.mark("calendar");
         holidays.tick();
+        profiler.mark("holidays");
         director.tick();
+        profiler.mark("villages");
         halloween.tick();
+        profiler.mark("halloween");
         gifts.tick();
         shows.tick();
+        profiler.mark("gifts+shows");
         wildlife.tick();
+        profiler.mark("wildlife");
         merchants.tick();
-        objectives.tick();
         haunting.tick();
+        profiler.mark("events");
+        objectives.tick();
+        profiler.mark("objectives");
         parties.tick();
         collection.tick();
+        profiler.mark("social");
+        profiler.endTick();
     }
 }

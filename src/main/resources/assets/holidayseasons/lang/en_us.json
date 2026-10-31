@@ -420,5 +420,12 @@
   "holidayseasons.collection.achievement.objectives_completed": "Village objectives helped: %s/%s",
   "holidayseasons.collection.achievement.parties_hosted": "Parties hosted: %s/%s",
   "holidayseasons.collection.achievement.guests_welcomed": "Party guests welcomed: %s/%s",
-  "holidayseasons.collection.totals": "All time: %s eggs, %s candy, %s presents, %s guests"
+  "holidayseasons.collection.totals": "All time: %s eggs, %s candy, %s presents, %s guests",
+  "holidayseasons.admin.title": "EverFest Server Settings",
+  "holidayseasons.admin.changes": "%s unsaved change(s) - hover a setting for details",
+  "holidayseasons.admin.range": "Allowed: %s to %s",
+  "holidayseasons.admin.fix_first": "Fix the settings shown in red first",
+  "holidayseasons.admin.saved": "EverFest: %s server setting(s) saved and applied",
+  "holidayseasons.admin.rejected": "EverFest: nothing was changed - %s",
+  "holidayseasons.configuration.general": "General"
 }

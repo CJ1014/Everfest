@@ -46,6 +46,11 @@ public final class ClientPayloadHandlers {
         ctx.enqueueWork(() -> Minecraft.getInstance().setScreen(new com.holidayseasons.client.screen.WrapPresentScreen(payload.pos(), payload.color())));
     }
 
+    public static void onAdminConfig(com.holidayseasons.network.AdminConfigPayload payload, IPayloadContext ctx) {
+        ctx.enqueueWork(() -> net.minecraft.client.Minecraft.getInstance().setScreen(
+                new com.holidayseasons.client.screen.AdminConfigScreen(payload.entries())));
+    }
+
     public static void onCollection(com.holidayseasons.network.CollectionPayload payload, IPayloadContext ctx) {
         ctx.enqueueWork(() -> net.minecraft.client.Minecraft.getInstance().setScreen(
                 new com.holidayseasons.client.screen.CollectionScreen(com.holidayseasons.reputation.CollectionData.Book.fromTag(payload.book()))));

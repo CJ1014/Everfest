@@ -63,6 +63,7 @@ public final class EverFest {
             e.register(com.holidayseasons.gametest.EconomyGameTests.class);
             e.register(com.holidayseasons.gametest.FestivalGameTests.class);
             e.register(com.holidayseasons.gametest.ProgressionGameTests.class);
+            e.register(com.holidayseasons.gametest.AdminGameTests.class);
         });
 
         NeoForge.EVENT_BUS.addListener(this::onServerStarted);

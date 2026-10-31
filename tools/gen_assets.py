@@ -786,6 +786,15 @@ def progression():
     update_lang(lang)
 
 
+def admin():
+    update_lang({
+        f"{NS}.admin.title": "EverFest Server Settings", f"{NS}.admin.changes": "%s unsaved change(s) - hover a setting for details",
+        f"{NS}.admin.range": "Allowed: %s to %s", f"{NS}.admin.fix_first": "Fix the settings shown in red first",
+        f"{NS}.admin.saved": "EverFest: %s server setting(s) saved and applied", f"{NS}.admin.rejected": "EverFest: nothing was changed - %s",
+        f"{NS}.configuration.general": "General",
+    })
+
+
 if __name__ == "__main__":
     items()
     blocks()
@@ -801,4 +810,5 @@ if __name__ == "__main__":
     events_and_parties()
     music_and_particles()
     progression()
+    admin()
     print("assets generated")

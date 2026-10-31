@@ -27,6 +27,9 @@ public final class EverFestNetwork {
                 (p, ctx) -> com.holidayseasons.client.ClientPayloadHandlers.onOpenHearth(p, ctx));
         r.playToServer(UpdateHearthPayload.TYPE, UpdateHearthPayload.STREAM_CODEC, UpdateHearthPayload::handle);
         r.playToServer(HostPartyPayload.TYPE, HostPartyPayload.STREAM_CODEC, HostPartyPayload::handle);
+        r.playToServer(SetConfigPayload.TYPE, SetConfigPayload.STREAM_CODEC, SetConfigPayload::handle);
+        r.playToClient(AdminConfigPayload.TYPE, AdminConfigPayload.STREAM_CODEC,
+                (p, ctx) -> com.holidayseasons.client.ClientPayloadHandlers.onAdminConfig(p, ctx));
         r.playToClient(CollectionPayload.TYPE, CollectionPayload.STREAM_CODEC,
                 (p, ctx) -> com.holidayseasons.client.ClientPayloadHandlers.onCollection(p, ctx));
         r.playToClient(OpenWrapPayload.TYPE, OpenWrapPayload.STREAM_CODEC,

@@ -29,6 +29,21 @@ public final class EverFestCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("everfest");
         root.then(Commands.literal("calendar").executes(EverFestCommands::openCalendar));
+        root.then(Commands.literal("perf").requires(s -> s.hasPermission(ADMIN_LEVEL)).executes(ctx -> {
+            var prof = EverFestServer.require().profiler();
+            prof.report().forEach(line -> ctx.getSource().sendSuccess(() -> Component.literal(line), false));
+            return (int) prof.ticks();
+        }).then(Commands.literal("reset").executes(ctx -> {
+            EverFestServer.require().profiler().reset();
+            ctx.getSource().sendSuccess(() -> Component.literal("EverFest timings reset"), false);
+            return 1;
+        })));
+        root.then(Commands.literal("admin").requires(s -> s.hasPermission(ADMIN_LEVEL))
+                .then(Commands.literal("config").executes(ctx -> {
+                    net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(ctx.getSource().getPlayerOrException(),
+                            new com.holidayseasons.network.AdminConfigPayload(com.holidayseasons.config.AdminConfig.describe()));
+                    return 1;
+                })));
         root.then(Commands.literal("collection").executes(ctx -> {
             EverFestServer.require().collection().open(ctx.getSource().getPlayerOrException());
             return 1;
