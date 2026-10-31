@@ -87,7 +87,8 @@ public final class FestivalGameTests {
         EverFestServer.require().director().assign(guest, task);
         helper.succeedWhen(() -> {
             helper.assertTrue(task.arrived(), "the guest walked to the party");
-            helper.assertTrue(guest.blockPosition().distSqr(door) <= 9, "and is at the door");
+            // Guests mingle up to 4 blocks from the door before walking back (PartyGuestTask).
+            helper.assertTrue(guest.blockPosition().distSqr(door) <= 25, "and stayed at the party");
             helper.assertTrue(task.isDone(), "and goes home when the party ends");
         });
     }

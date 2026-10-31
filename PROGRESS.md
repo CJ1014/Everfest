@@ -516,4 +516,77 @@ uses Modrinth version ids, which pin the NeoForge files.
 * The first graveyard visited live was generated before the tree-proof ground change (its tree stays; existing chunks
   are never regenerated); landmarks in chunks generated later use the current templates, as the cabin and cottage did.
 
-## Current milestone: 8 — Polish and release
+## Milestone 8 — Polish and release ✅ (acceptance criteria verified; see limitations)
+
+### Completed systems
+* **Original holiday music** (`tools/gen_music.py`): five pieces composed for EverFest (own melodies and chord
+  progressions, no existing tunes) and synthesized from sine partials, band-limited noise and a vectorized Schroeder
+  reverb — no samples or recordings: *Lantern Hollow* (Halloween, D-minor music-box waltz, 76 s), *Hearthlight*
+  (Christmas, G-major celesta with sleigh bells, 77 s), *Meadow Morning* (Easter/Valentine's, flute over plucked
+  arpeggios, 66 s), *Harvest Table* (Thanksgiving, A-mixolydian fiddle with frame drum, 57 s), *Midnight Fireworks*
+  (New Year's/Independence Day, brass march, 64 s). All levelled to the same loudness (RMS 0.11–0.12, no clipping),
+  streamed, 1.9 MB in total. While a holiday is celebrated, its track replaces the overworld background music (menu,
+  underwater, Nether and End music are untouched); client option `holidayMusic`.
+* **Seasonal atmosphere**: an autumn leaf particle with EverFest's own orange/red/yellow/brown sprites (vanilla
+  drifting-petal motion), spring petals, and winter flurries — not in hot biomes and not while it already snows.
+* **Holiday Collection Book** (item, recipe book + gold nugget + red dye, or `/everfest collection`): per-player data
+  saved with the world — holidays celebrated by year (being in a celebrating village counts), 38 collectibles in four
+  sections (decorations, costumes and hats, treats, rare finds incl. the Peddler's Lantern), 8 wildlife variants
+  spotted (line of sight within 16 blocks), 6 festival feats with targets and 7 special encounters; completion %.
+  Tracking is cheap (each player looked at every two seconds; everything else recorded where it happens).
+* **Advancements** (EverFest tab, 16): root, Home Sweet Home, Life of the Party (3+ guests), Trick or Treat!, Strange
+  Wares (Midnight Peddler), Restless Graves, Just What I Wished For, Egg Hunter (10 eggs), Golden Find, Happy New
+  Year!, Pillar of the Community, Local Legend (challenge), A Very Shiny Nose (red-nosed reindeer), A New Chapter,
+  Collector (challenge), A Year of Festivals (challenge, every enabled holiday).
+* **Operator config screen** (`/everfest admin config`): NeoForge's config screen cannot edit a SERVER config on a
+  remote server, so EverFest sends every server setting (type, range, options, description, translated label) to an
+  operator's client; the screen groups them by section, shows invalid input in red, and the server re-checks the
+  permission and validates every value against the spec, applying all or none and reloading the calendar/holidays.
+* **Performance**: `/everfest perf` reports per-system microseconds per tick (always on, negligible). The calendar
+  caches its immutable calendar-system objects and reuses same-day snapshots. Network: holiday status only on change, calendar
+  sync a small packet every 10 s, book/admin data only on request.
+* **Release packaging**: version 1.0.0, `neoforge.mods.toml` description and credits, `README.md` (install, features,
+  commands, configuration, data packs, performance) and `CHANGELOG.md`. License: All Rights Reserved (placeholder —
+  the owner should choose).
+
+### Test results
+* **Unit tests — 76/76**.
+* **GameTests — 48/48, two consecutive runs after the last change** (new in M8: every advancement loads; feats count and grant an advancement exactly once; inventory
+  scan collects only catalogue items and recognises the Peddler's Lantern; spotting a red-nosed reindeer records it and
+  grants its advancement; the book survives save/load; all server settings are described with types/ranges/options,
+  a batch with one bad value changes nothing, out-of-range and unknown settings are refused, lists and enums parse).
+* **Live (dev dedicated server + client)**:
+  * Music: the client selected *Lantern Hollow* during Halloween and switched it off when the date moved; no missing
+    sound warnings for EverFest. Autumn leaves seen drifting under birches; winter flurries over the village.
+  * Collection Book opened (10%), all five tabs clicked through; "A New Chapter" and "Golden Find" granted from real
+    items; the EverFest advancement tab rendered.
+  * Admin screen opened on the remote dedicated server; Leap Year Interval changed 4 → 5 through the screen, saved to
+    the server's config file, and changed back the same way.
+  * Timings during a celebrated Christmas (13 villagers, merchant, party): EverFest 0.1–0.33 ms/tick, server 20 TPS
+    at ~7 ms/tick. With **two clients** online: EverFest 0.28 ms/tick, 20 TPS at 9.2 ms/tick; each player's Collection
+    Book showed their own progress (FestTesterA 10%, FestTesterB 3% = the two items B was given).
+* **Production server**: the built `everfest-1.21.1-1.0.0.jar` on a NeoForge 21.1.265 server installed with the
+  official installer: loads with Serene Seasons + GlitchCore ("Serene Seasons integration enabled", 7 holidays, no
+  EverFest warnings), structures locate, every new mob summons, holiday commands work; and loads without Serene
+  Seasons ("seasons will follow the calendar").
+
+### Bugs found and fixed during M8 verification
+* The Collection Book's "Encounters" tab label was clipped → wider panel.
+* NeoForge FakePlayers never earn advancements → tests use a real, not-logged-in ServerPlayer; book notifications skip
+  players without a connection.
+* The party-guest GameTest demanded the guest be within 3 blocks at the moment the party ends, while guests may
+  mingle up to 4 blocks away (flaky, 1 failure in 4 runs) → the test now checks they stayed at the party (5 blocks).
+* A one-off 28 ms calendar spike did not recur (GC pause); the calendar's steady ~55–65 µs/tick was only slightly
+  reduced by caching (from ~67–75 µs) and is about 0.1% of the tick budget.
+
+### Known issues / limitations (M8)
+* Music quality was checked objectively (structure in spectrograms, loudness, no clipping) — nobody has listened to it
+  in this environment.
+* A production *client* was not tested (no launcher here); the client side was tested in the dev client throughout.
+* Advancement grants that need special situations (party with 3 guests, peddler, haunting, New Year's midnight) are
+  wired at the same code points that were verified live in M6/M7, but were not re-triggered live after M8.
+* License is a placeholder ("All Rights Reserved").
+
+## Status
+
+All eight milestones are implemented and verified as described above. Release jar: `build/libs/everfest-1.21.1-1.0.0.jar`.
