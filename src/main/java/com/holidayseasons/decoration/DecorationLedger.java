@@ -169,6 +169,14 @@ public final class DecorationLedger extends SavedData {
         return true;
     }
 
+    /** True if another EverFest decoration stands within {@code distance} blocks (Manhattan) of {@code pos}. */
+    public boolean decorationNear(ServerLevel level, BlockPos pos, int distance) {
+        for (Entry e : entries.values()) {
+            if (e.dimension == level.dimension() && e.pos.distManhattan(pos) <= distance) return true;
+        }
+        return false;
+    }
+
     /** Spawns the piece's displays at {@code pos} (and its light) and records them. Returns the number of entries. */
     public int place(ServerLevel level, BlockPos pos, DecorationPiece piece, float yaw, String occurrenceKey, String villageKey) {
         int count = 0;

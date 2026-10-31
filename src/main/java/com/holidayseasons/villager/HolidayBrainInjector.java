@@ -42,6 +42,9 @@ public final class HolidayBrainInjector {
         brain.addActivity(Activity.PLAY, ImmutableList.of(Pair.of(2, new CelebrationBehavior(director))));
         brain.addActivityWithConditions(Activity.MEET, ImmutableList.of(Pair.of(2, new CelebrationBehavior(director))),
                 ImmutableSet.of(Pair.of(MemoryModuleType.MEETING_POINT, MemoryStatus.VALUE_PRESENT)));
+        // Keeps vanilla's requirement for working (a job site); this copy only answers party invitations.
+        brain.addActivityWithConditions(Activity.WORK, ImmutableList.of(Pair.of(2, new CelebrationBehavior(director, true))),
+                ImmutableSet.of(Pair.of(MemoryModuleType.JOB_SITE, MemoryStatus.VALUE_PRESENT)));
         INJECTED.put(brain, Boolean.TRUE);
     }
 

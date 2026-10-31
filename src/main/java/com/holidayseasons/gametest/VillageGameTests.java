@@ -59,7 +59,10 @@ public final class VillageGameTests {
             helper.assertTrue(vanilla > 0 || a == Activity.PLAY, a + " has vanilla behaviours");
             helper.assertTrue(ours == vanilla + 1, a + ": expected vanilla " + vanilla + " + 1, got " + ours);
         }
-        for (Activity a : List.of(Activity.WORK, Activity.REST, Activity.PANIC, Activity.CORE, Activity.RAID)) {
+        // WORK gets exactly one extra behaviour, which only answers party invitations (see CelebrationBehavior).
+        helper.assertTrue(HolidayBrainInjector.behaviourCount(v, Activity.WORK) == HolidayBrainInjector.behaviourCount(reference, Activity.WORK) + 1,
+                "WORK: vanilla + the invitation-only behaviour");
+        for (Activity a : List.of(Activity.REST, Activity.PANIC, Activity.CORE, Activity.RAID)) {
             helper.assertTrue(HolidayBrainInjector.behaviourCount(reference, a) == HolidayBrainInjector.behaviourCount(v, a), a + " untouched");
         }
         // Injection is idempotent.

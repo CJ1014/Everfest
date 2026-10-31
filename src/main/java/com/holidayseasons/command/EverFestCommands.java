@@ -47,6 +47,7 @@ public final class EverFestCommands {
         root.then(Commands.literal("home")
                 .then(Commands.literal("list").executes(EverFestCommands::listHomes))
                 .then(Commands.literal("edit").executes(EverFestCommands::editHome))
+                .then(Commands.literal("party").executes(EverFestCommands::hostParty))
                 .then(Commands.literal("register").requires(s -> s.hasPermission(ADMIN_LEVEL))
                         .then(Commands.argument("pos", net.minecraft.commands.arguments.coordinates.BlockPosArgument.blockPos())
                                 .then(Commands.argument("owner", net.minecraft.commands.arguments.EntityArgument.player())
@@ -204,6 +205,25 @@ public final class EverFestCommands {
         }
         homes.refreshEntrance(p.serverLevel(), home);
         PacketDistributor.sendToPlayer(p, com.holidayseasons.network.OpenHearthPayload.of(home));
+        return 1;
+    }
+
+    /** Hosts a party at the player's own home within 16 blocks (same rules as the hearth screen's button). */
+    private static int hostParty(CommandContext<CommandSourceStack> ctx) {
+        ServerPlayer p = ctx.getSource().getPlayer();
+        if (p == null) return 0;
+        var home = EverFestServer.require().homes().ownedBy(p.getUUID()).stream()
+                .filter(h -> h.dimension == p.level().dimension() && h.hearth.distSqr(p.blockPosition()) < 16 * 16)
+                .findFirst().orElse(null);
+        if (home == null) {
+            ctx.getSource().sendFailure(Component.translatable("holidayseasons.home.none_nearby"));
+            return 0;
+        }
+        String problem = EverFestServer.require().parties().host(p, home);
+        if (problem != null) {
+            ctx.getSource().sendFailure(Component.translatable(problem));
+            return 0;
+        }
         return 1;
     }
 

@@ -59,6 +59,8 @@ public final class PartyGuestTask extends CelebrationTask {
             if (s != null) s.parties().guestArrived(homeId, v);
             sound(level, v, SoundEvents.VILLAGER_CELEBRATE, 0.8f, 1f);
         }
+        // Stay at the party: wander back if vanilla strolling carried the guest away.
+        if (v.blockPosition().distSqr(spot) > 16 && !walkTo(v, spot, 0.5f, 2)) return;
         partying++;
         lookAt(v, spot);
         if (partying % 40 == 0) {

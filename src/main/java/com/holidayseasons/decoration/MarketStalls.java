@@ -55,15 +55,21 @@ public final class MarketStalls {
         return block.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH);
     }
 
-    /** Whether the stall's 3x3 footprint around {@code pos} is open ground, three blocks tall. */
+    /**
+     * Whether the stall's 3x3 footprint around {@code pos} is open ground, three blocks tall. Grass and other
+     * replaceable plants count as open: the stall is made of displays and never changes a block.
+     */
     static boolean roomFor(ServerLevel level, DecorationLedger ledger, BlockPos pos) {
-        if (!ledger.isFreeSpot(level, pos)) return false;
+        if (!level.isLoaded(pos) || ledger.decorationNear(level, pos, 3)) return false;
         for (int dx = -1; dx <= 1; dx++) {
             for (int dz = -1; dz <= 1; dz++) {
                 BlockPos ground = pos.offset(dx, -1, dz);
-                if (!level.getBlockState(ground).isFaceSturdy(level, ground, Direction.UP)) return false;
+                BlockState g = level.getBlockState(ground);
+                // Any solid ground will do (paths and farmland too): the stall has no collision of its own.
+                if (g.getCollisionShape(level, ground).isEmpty() || !g.getFluidState().isEmpty()) return false;
                 for (int dy = 0; dy < 3; dy++) {
-                    if (!level.getBlockState(pos.offset(dx, dy, dz)).isAir()) return false;
+                    BlockState s = level.getBlockState(pos.offset(dx, dy, dz));
+                    if (!s.isAir() && !(s.canBeReplaced() && s.getFluidState().isEmpty())) return false;
                 }
             }
         }
@@ -75,8 +81,8 @@ public final class MarketStalls {
                                  String villageKey, RandomSource random) {
         if (ledger.countPieces(villageKey, occurrenceKey, PIECE_ID) > 0) return null;
         DecorationPiece piece = stall(holidayId.substring(holidayId.indexOf(':') + 1));
-        for (int i = 0; i < 24; i++) {
-            BlockPos at = near.offset(random.nextInt(9) - 4, random.nextInt(3) - 1, random.nextInt(9) - 4);
+        for (int i = 0; i < 48; i++) {
+            BlockPos at = near.offset(random.nextInt(13) - 6, random.nextInt(3) - 1, random.nextInt(13) - 6);
             if (!roomFor(level, ledger, at)) continue;
             float yaw = 90f * random.nextInt(4);
             if (ledger.place(level, at, piece, yaw, occurrenceKey, villageKey) > 0) return at;

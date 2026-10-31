@@ -48,6 +48,7 @@ final class WorldCommands {
         BlockPos at = BlockPos.containing(src.getPosition());
         com.holidayseasons.village.VillageRecord nearest = null;
         for (var r : s.director().villages().all()) {
+            if (!r.key.contains("|bell|")) continue;
             if (nearest == null || r.centre().distSqr(at) < nearest.centre().distSqr(at)) nearest = r;
         }
         if (nearest == null) {
@@ -56,7 +57,7 @@ final class WorldCommands {
         }
         var m = s.merchants().visitVillage(src.getLevel(), f, nearest, true);
         if (m == null) {
-            src.sendFailure(Component.literal("No merchant could come (one is already there, one came today, no player nearby, or no room)"));
+            src.sendFailure(Component.literal("No merchant could come (one is already there, no player nearby, or no room)"));
             return 0;
         }
         src.sendSuccess(() -> Component.literal("A " + f.holiday().id() + " merchant arrived at " + m.blockPosition().toShortString()), true);

@@ -13,12 +13,27 @@ import net.minecraft.world.entity.schedule.Activity;
  */
 public final class CelebrationBehavior extends Behavior<Villager> {
     private final CelebrationDirector director;
+    /** The copy living in the WORK activity only runs party invitations: a host's invitation calls a villager from work. */
+    private final boolean invitationsOnly;
     private CelebrationTask running;
 
     public CelebrationBehavior(CelebrationDirector director) {
+        this(director, false);
+    }
+
+    public CelebrationBehavior(CelebrationDirector director, boolean invitationsOnly) {
         // Tasks end themselves; the behaviour's own time-out is only a safety net.
         super(ImmutableMap.of(), 6000, 6000);
         this.director = director;
+        this.invitationsOnly = invitationsOnly;
+    }
+
+    private boolean eligibleFor(Villager v, CelebrationTask task) {
+        if (!invitationsOnly) return eligible(v);
+        if (task.type != TaskType.PARTY_GUEST || v.isSleeping() || v.isTrading() || !v.isAlive()) return false;
+        Brain<Villager> brain = v.getBrain();
+        return brain.isActive(Activity.WORK) && !brain.isActive(Activity.PANIC) && !brain.isActive(Activity.RAID)
+                && !brain.isActive(Activity.PRE_RAID) && !brain.isActive(Activity.HIDE);
     }
 
     static boolean eligible(Villager v) {
@@ -34,7 +49,7 @@ public final class CelebrationBehavior extends Behavior<Villager> {
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, Villager owner) {
         CelebrationTask task = director.taskFor(owner);
-        return task != null && !task.isDone() && !task.isRunning() && eligible(owner);
+        return task != null && !task.isDone() && !task.isRunning() && eligibleFor(owner, task);
     }
 
     @Override
@@ -45,7 +60,7 @@ public final class CelebrationBehavior extends Behavior<Villager> {
 
     @Override
     protected boolean canStillUse(ServerLevel level, Villager v, long gameTime) {
-        return running != null && running == director.taskFor(v) && !running.isDone() && eligible(v);
+        return running != null && running == director.taskFor(v) && !running.isDone() && eligibleFor(v, running);
     }
 
     @Override

@@ -62,23 +62,25 @@ public final class MerchantService {
         }
     }
 
+    /** Merchants visit real villages: ones with a bell, in this dimension. */
     private static boolean inOverworld(VillageRecord r, ServerLevel level) {
-        return r.key.startsWith(level.dimension().location() + "|");
+        return r.key.startsWith(level.dimension().location() + "|bell|");
     }
 
     /**
-     * A merchant may come to {@code village} today. {@code force} (commands/tests) skips the chance roll but not the
-     * once-per-day claim or the nearby-player rule. Returns the merchant, or null.
+     * A merchant may come to {@code village} today. {@code force} (operator command) skips the chance roll and the
+     * once-per-day claim, but never the nearby-player rule or the one-merchant-per-village rule. Returns the merchant.
      */
     @Nullable
     public HolidayMerchantEntity visitVillage(ServerLevel level, CelebrationDirector.Festival f, VillageRecord village, boolean force) {
         if (!inOverworld(village, level)) return null;
         BlockPos centre = village.centre();
-        if (!level.isLoaded(centre) || level.getNearestPlayer(centre.getX(), centre.getY(), centre.getZ(), PLAYER_RANGE, false) == null) return null;
+        if (!level.isLoaded(centre) || level.getNearestPlayer(centre.getX(), centre.getY(), centre.getZ(), PLAYER_RANGE,
+                e -> e instanceof net.minecraft.world.entity.player.Player p && !p.isSpectator()) == null) return null;
         if (!level.getEntitiesOfClass(HolidayMerchantEntity.class, new AABB(centre).inflate(64)).isEmpty()) return null;
         long day = services.calendar().schedulingSnapshot().epochDay();
         String claim = "merchant|" + f.occurrence().key() + "|" + village.key + "|" + day;
-        if (services.gifts().claims().has(claim)) return null;
+        if (!force && services.gifts().claims().has(claim)) return null;
         services.gifts().claims().claim(claim);
         double chance = ServerConfig.SPEC.isLoaded() ? ServerConfig.INSTANCE.merchantVisitChance.get() : 1.0;
         if (!force && random.nextDouble() >= chance) return null;

@@ -118,8 +118,12 @@ public final class PartyService {
         if (byHome.isEmpty()) return;
         long now = services.server().overworld().getGameTime();
         if (now % 20 != 0) return;
+        CelebrationDirector.Festival f = services.director().festival();
+        boolean celebrating = f != null && f.phase() == HolidayPhase.ACTIVE;
         byHome.values().removeIf(p -> {
-            if (p.level.getGameTime() < p.endsAt) return false;
+            // A party ends on time, or as soon as its holiday is no longer being celebrated.
+            boolean sameHoliday = celebrating && f.occurrence().key().equals(p.occurrence);
+            if (sameHoliday && p.level.getGameTime() < p.endsAt) return false;
             end(p);
             return true;
         });
